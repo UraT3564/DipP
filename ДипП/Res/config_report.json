@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1740012345",
+    "displayName": "Отчет о работе СДК за месяц",
+    "templateFile": "Отчет_месячный.docx",
+    "fields": [ "OrganizationName", "Month", "Year" ],
+    "tableColumns": [ "Number", "EventName", "EventDate", "EventLink", "Participants", "Location", "Responsible" ],
+    "summaryColumns":[]
+  },
+  {
+    "id": "1740012346",
+    "displayName": "Отчет о мероприятиях",
+    "templateFile": "Отчет_мероприятия.docx",
+    "fields": [ "OrganizationName", "Month", "Year" ],
+    "tableColumns": [ "Number", "EventName", "TotalParticipants", "Children0to14", "Children14to35", "AdultsOver35" ],
+    "summaryColumns": [ "TotalParticipants", "Children0to14", "Children14to35", "AdultsOver35" ]
+  }
+]

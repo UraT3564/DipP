@@ -1,0 +1,495 @@
+[
+  {
+    "Id": "evt_001",
+    "Type": "event",
+    "Date": "2025-01-02",
+    "Fields": {
+      "EventName": "Дискотека «Новогодний марафон»",
+      "EventDate": "02.01.2025",
+      "EventLink": "",
+      "Participants": "21",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "21",
+      "Children0to14": "0",
+      "Children14to35": "21",
+      "AdultsOver35": "0"
+    }
+  },
+  {
+    "Id": "evt_002",
+    "Type": "event",
+    "Date": "2025-01-03",
+    "Fields": {
+      "EventName": "Дискотека «Зимняя мозаика»",
+      "EventDate": "03.01.2025",
+      "EventLink": "",
+      "Participants": "12",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "12",
+      "Children0to14": "0",
+      "Children14to35": "12",
+      "AdultsOver35": "0"
+    }
+  },
+  {
+    "Id": "evt_003",
+    "Type": "event",
+    "Date": "2025-01-05",
+    "Fields": {
+      "EventName": "Танцевально-игровая программа «Новогодняя карусель»",
+      "EventDate": "05.01.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158631540658969",
+      "Participants": "19",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "19",
+      "Children0to14": "16",
+      "Children14to35": "1",
+      "AdultsOver35": "2"
+    }
+  },
+  {
+    "Id": "evt_004",
+    "Type": "event",
+    "Date": "2025-01-07",
+    "Fields": {
+      "EventName": "Святочные традиционные развлечения «Ходила Коляда»",
+      "EventDate": "07.01.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158635616080665",
+      "Participants": "26",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "26",
+      "Children0to14": "16",
+      "Children14to35": "0",
+      "AdultsOver35": "10"
+    }
+  },
+  {
+    "Id": "evt_005",
+    "Type": "event",
+    "Date": "2025-01-07",
+    "Fields": {
+      "EventName": "Дискотека «Рождественские мелодии»",
+      "EventDate": "07.01.2025",
+      "EventLink": "",
+      "Participants": "6",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "6",
+      "Children0to14": "0",
+      "Children14to35": "6",
+      "AdultsOver35": "0"
+    }
+  },
+  {
+    "Id": "evt_006",
+    "Type": "event",
+    "Date": "2025-01-08",
+    "Fields": {
+      "EventName": "Рождественские посиделки",
+      "EventDate": "08.01.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158637614338841",
+      "Participants": "12",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "12",
+      "Children0to14": "0",
+      "Children14to35": "0",
+      "AdultsOver35": "12"
+    }
+  },
+  {
+    "Id": "evt_007",
+    "Type": "event",
+    "Date": "2025-01-11",
+    "Fields": {
+      "EventName": "Информационный час «Не скупитесь на слово спасибо»",
+      "EventDate": "11.01.2025",
+      "EventLink": "",
+      "Participants": "7",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "7",
+      "Children0to14": "7",
+      "Children14to35": "0",
+      "AdultsOver35": "0"
+    }
+  },
+  {
+    "Id": "evt_008",
+    "Type": "event",
+    "Date": "2025-01-14",
+    "Fields": {
+      "EventName": "Встреча участников клуба ЛАДА «Праздник в коллективе»",
+      "EventDate": "14.01.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158650071487257",
+      "Participants": "12",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "12",
+      "Children0to14": "0",
+      "Children14to35": "0",
+      "AdultsOver35": "12"
+    }
+  },
+  {
+    "Id": "evt_009",
+    "Type": "event",
+    "Date": "2025-01-17",
+    "Fields": {
+      "EventName": "Девичья вечеринка «Гадание на святки»",
+      "EventDate": "17.01.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158653977105177",
+      "Participants": "13",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "13",
+      "Children0to14": "13",
+      "Children14to35": "0",
+      "AdultsOver35": "0"
+    }
+  },
+  {
+    "Id": "evt_010",
+    "Type": "event",
+    "Date": "2025-01-20",
+    "Fields": {
+      "EventName": "Час мужества «Зажги свечу о жертвах Холокоста»",
+      "EventDate": "20.01.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158659520598809",
+      "Participants": "32",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "32",
+      "Children0to14": "27",
+      "Children14to35": "2",
+      "AdultsOver35": "3"
+    }
+  },
+  {
+    "Id": "evt_011",
+    "Type": "event",
+    "Date": "2025-02-02",
+    "Fields": {
+      "EventName": "Час истории «Не забудем подвиг Сталинграда»",
+      "EventDate": "02.02.2025",
+      "EventLink": "",
+      "Participants": "12",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "12",
+      "Children0to14": "11",
+      "Children14to35": "0",
+      "AdultsOver35": "1"
+    }
+  },
+  {
+    "Id": "evt_012",
+    "Type": "event",
+    "Date": "2025-02-14",
+    "Fields": {
+      "EventName": "Беседа «России верные сыны»",
+      "EventDate": "14.02.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158702164546329",
+      "Participants": "21",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "21",
+      "Children0to14": "11",
+      "Children14to35": "6",
+      "AdultsOver35": "4"
+    }
+  },
+  {
+    "Id": "evt_013",
+    "Type": "event",
+    "Date": "2025-02-15",
+    "Fields": {
+      "EventName": "Акция «Вы выполнили приказ Родины!»",
+      "EventDate": "15.02.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158703536345881",
+      "Participants": "12",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "12",
+      "Children0to14": "0",
+      "Children14to35": "5",
+      "AdultsOver35": "7"
+    }
+  },
+  {
+    "Id": "evt_014",
+    "Type": "event",
+    "Date": "2025-02-20",
+    "Fields": {
+      "EventName": "Акция #памятигероев (благоустройство памятника)",
+      "EventDate": "20.02.2025",
+      "EventLink": "",
+      "Participants": "17",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "17",
+      "Children0to14": "0",
+      "Children14to35": "5",
+      "AdultsOver35": "12"
+    }
+  },
+  {
+    "Id": "evt_015",
+    "Type": "event",
+    "Date": "2025-02-21",
+    "Fields": {
+      "EventName": "Акция «Спасибо вам за сыновей»",
+      "EventDate": "21.02.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158714329666329",
+      "Participants": "86",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "86",
+      "Children0to14": "35",
+      "Children14to35": "10",
+      "AdultsOver35": "41"
+    }
+  },
+  {
+    "Id": "evt_016",
+    "Type": "event",
+    "Date": "2025-02-21",
+    "Fields": {
+      "EventName": "Благотворительный концерт «Защитникам Отечества посвящается»",
+      "EventDate": "21.02.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158714403066649",
+      "Participants": "75",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "75",
+      "Children0to14": "35",
+      "Children14to35": "10",
+      "AdultsOver35": "30"
+    }
+  },
+  {
+    "Id": "evt_017",
+    "Type": "event",
+    "Date": "2025-02-24",
+    "Fields": {
+      "EventName": "Частушечный марафон",
+      "EventDate": "24.02.2025",
+      "EventLink": "",
+      "Participants": "21",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "21",
+      "Children0to14": "10",
+      "Children14to35": "11",
+      "AdultsOver35": "0"
+    }
+  },
+  {
+    "Id": "evt_018",
+    "Type": "event",
+    "Date": "2025-02-25",
+    "Fields": {
+      "EventName": "Праздник в коллективе «Юбилейные страдания»",
+      "EventDate": "25.02.2025",
+      "EventLink": "",
+      "Participants": "15",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "15",
+      "Children0to14": "0",
+      "Children14to35": "0",
+      "AdultsOver35": "15"
+    }
+  },
+  {
+    "Id": "evt_019",
+    "Type": "event",
+    "Date": "2025-02-25",
+    "Fields": {
+      "EventName": "Час фольклора «Масленичные заигрыши»",
+      "EventDate": "25.02.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158722756416281",
+      "Participants": "18",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "18",
+      "Children0to14": "17",
+      "Children14to35": "0",
+      "AdultsOver35": "1"
+    }
+  },
+  {
+    "Id": "evt_020",
+    "Type": "event",
+    "Date": "2025-03-02",
+    "Fields": {
+      "EventName": "Блинная дискотека для подростков и молодежи",
+      "EventDate": "02.03.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158731771155225",
+      "Participants": "21",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "21",
+      "Children0to14": "20",
+      "Children14to35": "0",
+      "AdultsOver35": "1"
+    }
+  },
+  {
+    "Id": "evt_021",
+    "Type": "event",
+    "Date": "2025-03-02",
+    "Fields": {
+      "EventName": "Праздник для детей «Как на масленой неделе»",
+      "EventDate": "02.03.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158731933225753",
+      "Participants": "74",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "74",
+      "Children0to14": "50",
+      "Children14to35": "16",
+      "AdultsOver35": "8"
+    }
+  },
+  {
+    "Id": "evt_022",
+    "Type": "event",
+    "Date": "2025-03-06",
+    "Fields": {
+      "EventName": "Празднично-развлекательная программа «Женщина-восьмое чудо света»",
+      "EventDate": "06.03.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158743709848345",
+      "Participants": "18",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "18",
+      "Children0to14": "0",
+      "Children14to35": "0",
+      "AdultsOver35": "18"
+    }
+  },
+  {
+    "Id": "evt_023",
+    "Type": "event",
+    "Date": "2025-03-09",
+    "Fields": {
+      "EventName": "Праздничная тематическая дискотека «Девчонки рулят!»",
+      "EventDate": "09.03.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158759021089561",
+      "Participants": "23",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "23",
+      "Children0to14": "0",
+      "Children14to35": "22",
+      "AdultsOver35": "1"
+    }
+  },
+  {
+    "Id": "evt_024",
+    "Type": "event",
+    "Date": "2025-03-18",
+    "Fields": {
+      "EventName": "Час истории для детей «Крым и Россия вместе»",
+      "EventDate": "18.03.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158776995255065",
+      "Participants": "14",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "14",
+      "Children0to14": "13",
+      "Children14to35": "0",
+      "AdultsOver35": "1"
+    }
+  },
+  {
+    "Id": "evt_025",
+    "Type": "event",
+    "Date": "2025-03-23",
+    "Fields": {
+      "EventName": "Музыкально-игровая программа «Ура! Каникулы!»",
+      "EventDate": "23.03.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158815194026777",
+      "Participants": "19",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "19",
+      "Children0to14": "19",
+      "Children14to35": "0",
+      "AdultsOver35": "0"
+    }
+  },
+  {
+    "Id": "evt_026",
+    "Type": "event",
+    "Date": "2025-03-24",
+    "Fields": {
+      "EventName": "Дни открытых дверей «Перезагрузка»",
+      "EventDate": "24.03.2025",
+      "EventLink": "https://ok.ru/profile/575467847961/statuses/158815214015257",
+      "Participants": "54",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "54",
+      "Children0to14": "54",
+      "Children14to35": "0",
+      "AdultsOver35": "0"
+    }
+  },
+  {
+    "Id": "evt_027",
+    "Type": "event",
+    "Date": "2025-03-30",
+    "Fields": {
+      "EventName": "Участие в окружном фестивале «Играй гармонь, звени частушка»",
+      "EventDate": "30.03.2025",
+      "EventLink": "",
+      "Participants": "10",
+      "Location": "Партизанский РКДЦ",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "10",
+      "Children0to14": "6",
+      "Children14to35": "0",
+      "AdultsOver35": "4"
+    }
+  },
+  {
+    "Id": "evt_028",
+    "Type": "event",
+    "Date": "2025-03-31",
+    "Fields": {
+      "EventName": "Час развлечений «Игротека»",
+      "EventDate": "31.03.2025",
+      "EventLink": "",
+      "Participants": "18",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "18",
+      "Children0to14": "18",
+      "Children14to35": "0",
+      "AdultsOver35": "0"
+    }
+  },
+  {
+    "Id": "evt_029",
+    "Type": "event",
+    "Date": "2025-03-01",
+    "Fields": {
+      "EventName": "Час спорта «Дружеские встречи за бильярдным столом»",
+      "EventDate": "март 2025 (регулярно)",
+      "EventLink": "",
+      "Participants": "132",
+      "Location": "Алексеевский СДК",
+      "Responsible": "Черских Т.Г.",
+      "TotalParticipants": "132",
+      "Children0to14": "0",
+      "Children14to35": "12",
+      "AdultsOver35": "120"
+    }
+  }
+]

@@ -1,0 +1,80 @@
+{
+  "storages": [
+    {
+      "id": "main_events",
+      "displayName": "Основное хранилище (мероприятия)",
+      "filePath": "Res/Data/storage.json",
+      "type": "event",
+      "fields": [
+        {
+          "key": "EventName",
+          "display": "Название мероприятия",
+          "required": true
+        },
+        {
+          "key": "EventDate",
+          "display": "Дата",
+          "required": true
+        },
+        {
+          "key": "EventLink",
+          "display": "Ссылка",
+          "required": false
+        },
+        {
+          "key": "Participants",
+          "display": "Участники (всего)",
+          "required": false
+        },
+        {
+          "key": "TotalParticipants",
+          "display": "Участники (всего)",
+          "required": false
+        },
+        {
+          "key": "Location",
+          "display": "Место",
+          "required": false
+        },
+        {
+          "key": "Responsible",
+          "display": "Ответственный",
+          "required": false
+        },
+        {
+          "key": "Children0to14",
+          "display": "Дети 0-14 лет",
+          "required": false
+        },
+        {
+          "key": "Children14to35",
+          "display": "Дети 14-35 лет",
+          "required": false
+        },
+        {
+          "key": "AdultsOver35",
+          "display": "Взрослые (35+)",
+          "required": false
+        }
+      ]
+    },
+    {
+      "id": "test_data",
+      "displayName": "Тестовое хранилище (маленькое)",
+      "filePath": "Res/Data/test_storage.json",
+      "type": "event",
+      "fields": [
+        {
+          "key": "Name",
+          "display": "Название",
+          "required": true
+        },
+        {
+          "key": "Count",
+          "display": "Количество",
+          "required": false
+        }
+      ]
+    }
+  ]
+}
