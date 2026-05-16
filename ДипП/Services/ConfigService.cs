@@ -1,7 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.IO;
+using System.Text;
+using System.Windows.Forms;
 using ДипП.Models;
 
 namespace ДипП.Services
@@ -23,16 +25,30 @@ namespace ДипП.Services
 
             try
             {
-                string json = File.ReadAllText(configFilePath);
-                configs = JsonConvert.DeserializeObject<List<TemplateConfig>>(json);
-
-                foreach (var config in configs)
+                // Проверка целостности
+                string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, configFilePath);
+                if (!HashHelper.VerifyFileIntegrity(fullPath))
                 {
-                    if (string.IsNullOrEmpty(config.Id))
-                        config.Id = Guid.NewGuid().ToString(); // на всякий случай
+                    MessageBox.Show(
+                        "Файл конфигурации шаблонов поврежден. Будет использована резервная копия.\n\n" +
+                        "Проверьте целостность файла config_report.json",
+                        "Нарушение целостности",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+
+                    // Пробуем восстановить из бэкапа
+                    string backupPath = fullPath + ".backup";
+                    if (File.Exists(backupPath))
+                    {
+                        File.Copy(backupPath, fullPath, true);
+                        HashHelper.SaveHashFile(fullPath);
+                    }
                 }
 
-                Console.WriteLine($"[ConfigService] Загружено шаблонов: {configs.Count}");
+                string json = File.ReadAllText(fullPath, Encoding.UTF8);
+                configs = JsonConvert.DeserializeObject<List<TemplateConfig>>(json);
+
+                // ... остальной код
             }
             catch (Exception ex)
             {
@@ -41,5 +57,38 @@ namespace ДипП.Services
 
             return configs;
         }
+
+        public void SaveAllConfigs(List<TemplateConfig> configs)
+        {
+            try
+            {
+                string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _configsPath, "config_report.json");
+                string directory = Path.GetDirectoryName(fullPath);
+                if (!Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+
+                // Резервная копия
+                if (File.Exists(fullPath))
+                {
+                    string backupPath = fullPath + ".backup";
+                    if (File.Exists(backupPath))
+                        File.Delete(backupPath);
+                    File.Copy(fullPath, backupPath);
+                }
+
+                string json = JsonConvert.SerializeObject(configs, Formatting.Indented);
+                File.WriteAllText(fullPath, json, Encoding.UTF8);
+
+                // Обновляем хэш
+                HashHelper.SaveHashFile(fullPath);
+
+                Console.WriteLine($"[ConfigService] Сохранено шаблонов: {configs.Count}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ConfigService] Ошибка сохранения: {ex.Message}");
+                throw;
+            }
+        }
     }
-    }
+}

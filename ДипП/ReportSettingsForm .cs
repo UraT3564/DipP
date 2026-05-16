@@ -18,6 +18,8 @@ namespace ДипП
         private List<TemplateConfig> _templates;
         private DataRepository _repository;
         private TemplateConfig _selectedTemplate;
+        private StorageConfig _selectedStorage;
+        private StorageConfigService _storageConfigService;
         private DateTime _selectedDate;
         private ReportCalculator _calculator = new ReportCalculator();
 
@@ -26,7 +28,7 @@ namespace ДипП
             InitializeComponent();
             _templates = templates;
             _repository = repository;
-
+            _storageConfigService = new StorageConfigService();
             SetupControls();
         }
 
@@ -64,6 +66,7 @@ namespace ДипП
             {
                 _selectedTemplate = cmbTemplate.SelectedItem as TemplateConfig;
                 LoadPropertiesData();
+                LoadStorageForTemplate();
                 LoadPreviewData();
             };
 
@@ -184,6 +187,7 @@ namespace ДипП
             if (_templates != null && _templates.Count > 0)
             {
                 _selectedTemplate = _templates[0]; // вызовет LoadPreviewData через событие
+                LoadStorageForTemplate();
             }
 
             _selectedDate = DateTime.Now;
@@ -198,10 +202,8 @@ namespace ДипП
         }
         private void LoadPreviewData()
         {
-            if (_selectedTemplate == null)return;
-            
+            if (_selectedTemplate == null) return;
 
-            // Получаем все контролы
             var grid = this.Controls["gridPreview"] as DataGridView;
             if (grid == null)
             {
@@ -211,8 +213,10 @@ namespace ДипП
 
             try
             {
-                // ЗАГРУЖАЕМ ДАННЫЕ В ГРИД
-                var allEvents = _repository.GetByType("event");
+                // Получаем тип хранилища из шаблона
+                string storageType = _selectedStorage?.Type ?? "event";
+
+                var allEvents = _repository.GetByType(storageType);
                 var events = allEvents.Where(e =>
                 {
                     if (DateTime.TryParse(e.Date, out DateTime eventDate))
@@ -223,8 +227,11 @@ namespace ДипП
                     return false;
                 }).ToList();
 
-                var dt = new System.Data.DataTable();
-                foreach (var col in _selectedTemplate.TableColumns)
+                var dt = new DataTable();
+
+                // Добавляем колонки из маппинга таблицы (используем ключи маппинга)
+                var displayColumns = _selectedTemplate.TableFieldMappings.Keys.ToList();
+                foreach (var col in displayColumns)
                 {
                     dt.Columns.Add(col);
                 }
@@ -232,17 +239,32 @@ namespace ДипП
                 foreach (var ev in events)
                 {
                     var row = dt.NewRow();
-                    foreach (var col in _selectedTemplate.TableColumns)
+                    foreach (var mapping in _selectedTemplate.TableFieldMappings)
                     {
-                        if (ev.Fields.ContainsKey(col))
-                            row[col] = ev.Fields[col]?.ToString() ?? "";
+                        string markerName = mapping.Key;
+                        string storageField = mapping.Value.StorageField;
+
+                        if (!string.IsNullOrEmpty(storageField) && ev.Fields.ContainsKey(storageField))
+                        {
+                            string value = ev.Fields[storageField]?.ToString() ?? "";
+
+                            // Применяем формат даты если нужно
+                            if (mapping.Value.DateFormat != null && !string.IsNullOrEmpty(value))
+                            {
+                                value = DateHelper.FormatDateValue(value, mapping.Value.DateFormat);
+                            }
+
+                            row[markerName] = value;
+                        }
+                        else
+                        {
+                            row[markerName] = "";
+                        }
                     }
                     dt.Rows.Add(row);
                 }
 
                 grid.DataSource = dt;
-
-
             }
             catch (Exception ex)
             {
@@ -252,7 +274,6 @@ namespace ДипП
 
         private void LoadPropertiesData()
         {
-            // Ищем GroupBox по имени
             var grpInfo = this.Controls["grpTemplateInfo"] as GroupBox;
             if (grpInfo == null) return;
 
@@ -263,41 +284,62 @@ namespace ДипП
 
             if (_selectedTemplate == null) return;
 
-            // Основная информация (не видна в таблице)
             lstProperties.Items.Add($"📄 {_selectedTemplate.DisplayName}");
             lstProperties.Items.Add($"Файл: {_selectedTemplate.TemplateFile}");
             lstProperties.Items.Add("──────────────");
 
-            // 1. Есть ли автоматическая нумерация строк
-            bool hasNumberColumn = _selectedTemplate.TableColumns?
-                .Any(c => c.IndexOf("Number", StringComparison.OrdinalIgnoreCase) >= 0) ?? false;
-            lstProperties.Items.Add($"🔢 Нумерация строк: {(hasNumberColumn ? "Да (авто)" : "Нет")}");
-
-            // 2. Есть ли итоговая строка (не видна в预览, но будет в документе)
-            bool hasSummary = _selectedTemplate.SummaryColumns != null &&
-                             _selectedTemplate.SummaryColumns.Count > 0;
-            lstProperties.Items.Add($"🧮 Итоговая строка: {(hasSummary ? "Да" : "Нет")}");
-
-            // 3. Какие колонки будут суммироваться (если есть)
-            if (hasSummary)
+            // Информация о хранилище
+            if (_selectedStorage != null)
             {
-                foreach (var col in _selectedTemplate.SummaryColumns)
+                lstProperties.Items.Add($"🗄️ Хранилище: {_selectedStorage.DisplayName}");
+            }
+            else
+            {
+                lstProperties.Items.Add($"⚠️ Хранилище не указано");
+            }
+            lstProperties.Items.Add("──────────────");
+
+            // Поля в тексте
+            int textFieldsCount = _selectedTemplate.TextFieldMappings?.Count ?? 0;
+            lstProperties.Items.Add($"📝 Поля в тексте ({textFieldsCount}):");
+            foreach (var field in _selectedTemplate.TextFieldMappings ?? new Dictionary<string, FieldMapping>())
+            {
+                string marker = field.Key;
+                var mapping = field.Value;
+
+                if (mapping.IsStatic)
                 {
-                    lstProperties.Items.Add($"   • {col}");
+                    lstProperties.Items.Add($"   • {marker} → (статическое: {mapping.StaticValue})");
+                }
+                else
+                {
+                    string dateInfo = string.IsNullOrEmpty(mapping.DateFormat) ? "" : $" [{mapping.DateFormat}]";
+                    lstProperties.Items.Add($"   • {marker} → {mapping.StorageField}{dateInfo}");
                 }
             }
+            lstProperties.Items.Add("──────────────");
 
-            // 4. Есть ли поля, которые не отображаются в таблице
-            if (_selectedTemplate.Fields != null && _selectedTemplate.Fields.Count > 0)
+            // Поля в таблице
+            int tableFieldsCount = _selectedTemplate.TableFieldMappings?.Count ?? 0;
+            lstProperties.Items.Add($"📊 Поля в таблице ({tableFieldsCount}):");
+            foreach (var field in _selectedTemplate.TableFieldMappings ?? new Dictionary<string, FieldMapping>())
             {
-                lstProperties.Items.Add("──────────────");
-                lstProperties.Items.Add($"📌 Поля шаблона (вне таблицы):");
-                foreach (var field in _selectedTemplate.Fields)
+                string marker = field.Key;
+                var mapping = field.Value;
+                bool isAutoNumber = _selectedTemplate.AutoNumberMarker == marker;
+
+                if (isAutoNumber)
                 {
-                    lstProperties.Items.Add($"   • {field}");
+                    lstProperties.Items.Add($"   🔢 {marker} → (автонумерация)");
+                }
+                else
+                {
+                    string dateInfo = string.IsNullOrEmpty(mapping.DateFormat) ? "" : $" [{mapping.DateFormat}]";
+                    lstProperties.Items.Add($"   • {marker} → {mapping.StorageField}{dateInfo}");
                 }
             }
         }
+
 
         private void BtnGenerate_Click(object sender, EventArgs e)
         {
@@ -318,10 +360,22 @@ namespace ДипП
         {
             ReportGenerated?.Invoke(this, e);
         }
-
+        
 
         // Свойства для доступа к выбранным значениям
         public TemplateConfig SelectedTemplate => _selectedTemplate;
         public DateTime SelectedDate => _selectedDate;
+
+        private void LoadStorageForTemplate()
+        {
+            if (_selectedTemplate == null || string.IsNullOrEmpty(_selectedTemplate.StorageId))
+            {
+                _selectedStorage = null;
+                return;
+            }
+
+            var storages = _storageConfigService.LoadAll();
+            _selectedStorage = storages.FirstOrDefault(s => s.Id == _selectedTemplate.StorageId);
+        }
     }
 }

@@ -5,7 +5,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using ДипП.Models;
+using ДипП.Services;
 
 namespace ДипП
 {
@@ -13,6 +15,7 @@ namespace ДипП
     {
         private List<DataEntity> _entities = new List<DataEntity>();
         private readonly string _dataPath;
+        private bool _integrityWarningShown = false;
 
         public DataRepository(string customPath = null)
         {
@@ -21,28 +24,109 @@ namespace ДипП
             else
                 _dataPath = Path.Combine("Res", "Data", "storage.json");
         }
+
         public void Load()
         {
-            string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _dataPath);
-            Console.WriteLine($"Загрузка данных из: {fullPath}");
+            try
+            {
+                string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _dataPath);
 
-            if (File.Exists(fullPath))
-            {
+                if (!File.Exists(fullPath))
+                {
+                    _entities = new List<DataEntity>();
+                    Save(); // Создаем пустой файл с хэшем
+                    return;
+                }
+
+                // Проверка целостности файла
+                if (!HashHelper.VerifyFileIntegrity(fullPath) && !_integrityWarningShown)
+                {
+                    _integrityWarningShown = true;
+                    var result = MessageBox.Show(
+                        "Файл данных поврежден или был изменен вручную.\n\n" +
+                        "• Нажмите 'Да' - продолжить работу с текущим файлом (хэш будет обновлен)\n" +
+                        "• Нажмите 'Нет' - восстановить данные из резервной копии\n" +
+                        "• Нажмите 'Отмена' - создать новый пустой файл",
+                        "Нарушение целостности данных",
+                        MessageBoxButtons.YesNoCancel,
+                        MessageBoxIcon.Warning);
+
+                    if (result == DialogResult.No)
+                    {
+                        RestoreFromBackup(fullPath);
+                    }
+                    else if (result == DialogResult.Cancel)
+                    {
+                        _entities = new List<DataEntity>();
+                        Save();
+                        return;
+                    }
+                    // Если Да — продолжаем, хэш обновится при сохранении
+                }
+
                 string json = File.ReadAllText(fullPath, Encoding.UTF8);
-                Console.WriteLine($"JSON прочитан, длина: {json.Length}");
                 _entities = JsonConvert.DeserializeObject<List<DataEntity>>(json) ?? new List<DataEntity>();
-                Console.WriteLine($"Загружено сущностей: {_entities.Count}");
+
+                Console.WriteLine($"[DataRepository] Загружено сущностей: {_entities.Count}");
             }
-            else
+            catch (Exception ex)
             {
-                Console.WriteLine($"Файл не найден: {fullPath}");
+                Console.WriteLine($"[DataRepository] Ошибка загрузки: {ex.Message}");
+                _entities = new List<DataEntity>();
             }
         }
 
         public void Save()
         {
-            string json = JsonConvert.SerializeObject(_entities, Formatting.Indented);
-            File.WriteAllText(_dataPath, json, Encoding.UTF8);
+            try
+            {
+                string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _dataPath);
+                string directory = Path.GetDirectoryName(fullPath);
+                if (!Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+
+                // Создаем резервную копию перед сохранением
+                if (File.Exists(fullPath))
+                {
+                    string backupPath = fullPath + ".backup";
+                    if (File.Exists(backupPath))
+                        File.Delete(backupPath);
+                    File.Copy(fullPath, backupPath);
+                }
+
+                string json = JsonConvert.SerializeObject(_entities, Formatting.Indented);
+                File.WriteAllText(fullPath, json, Encoding.UTF8);
+
+                // Обновляем хэш после сохранения
+                HashHelper.SaveHashFile(fullPath);
+
+                Console.WriteLine($"[DataRepository] Сохранено сущностей: {_entities.Count}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[DataRepository] Ошибка сохранения: {ex.Message}");
+                throw;
+            }
+        }
+
+        private void RestoreFromBackup(string fullPath)
+        {
+            string backupPath = fullPath + ".backup";
+            if (File.Exists(backupPath))
+            {
+                File.Copy(backupPath, fullPath, true);
+                HashHelper.SaveHashFile(fullPath);
+                Load(); // Перезагружаем
+                MessageBox.Show("Данные восстановлены из резервной копии", "Восстановление",
+                               MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBox.Show("Резервная копия не найдена. Будет создан новый пустой файл.",
+                               "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                _entities = new List<DataEntity>();
+                Save();
+            }
         }
 
         public List<DataEntity> GetByType(string type)

@@ -28,13 +28,16 @@ namespace ДипП
         private Button btnDelete;
         private Button btnRefresh;
         private Label lblMonthInfo;
-
+        private SettingsService _settingsService;
+        private string _organizationName;
         public TestForm()
         {
             InitializeComponent();
             _configService = new ConfigService();
             _dataRepository = new DataRepository();
             _dataRepository.Load();
+            _settingsService = new SettingsService();
+            _organizationName = _settingsService.GetOrganizationName();
 
             LoadConfiguration();
             SetupForm();
@@ -63,7 +66,6 @@ namespace ДипП
         private void SetupForm()
         {
             this.Text = "Управление данными СДК";
-            //this.Size = new Size(1000, 650);
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Font = new Font("Segoe UI", 10);
 
@@ -129,110 +131,134 @@ namespace ДипП
             this.Controls.Add(gridEvents);
             currentY += gridEvents.Height + 15;
 
-            // ===== КНОПКИ НАВИГАЦИИ (ПЕРВЫЙ РЯД) =====
-            int buttonWidth = 150;
-            int buttonHeight = 40;
+            // ===== ОБЛАСТЬ КНОПОК (РАЗДЕЛЕННАЯ НА ДВЕ КОЛОНКИ) =====
+            int panelWidth = 760;
+            int panelHeight = 140;
+            int halfWidth = (panelWidth - 10) / 2; // с отступом между колонками
+
+            // Левая панель: Навигация
+            GroupBox navGroup = new GroupBox
+            {
+                Text = "Навигация по модулям",
+                Location = new Point(margin, currentY),
+                Size = new Size(halfWidth, panelHeight),
+                Font = new Font(this.Font, FontStyle.Bold)
+            };
+            this.Controls.Add(navGroup);
+
+            // Правая панель: Управление данными
+            GroupBox dataGroup = new GroupBox
+            {
+                Text = "Управление данными",
+                Location = new Point(margin + halfWidth + 10, currentY),
+                Size = new Size(halfWidth, panelHeight),
+                Font = new Font(this.Font, FontStyle.Bold)
+            };
+            this.Controls.Add(dataGroup);
+
+            // ===== КНОПКИ НАВИГАЦИИ (ЛЕВАЯ ПАНЕЛЬ) =====
+            int buttonWidth = 140;
+            int buttonHeight = 50;
             int spacing = 10;
-            int startX = margin;
+            int startX = 10;
+            int startY = 22;
 
             btnCreateReport = new Button
             {
                 Text = "📊 Создать отчет",
-                Location = new Point(startX, currentY),
+                Location = new Point(startX, startY),
                 Size = new Size(buttonWidth, buttonHeight),
                 BackColor = Color.LightBlue,
                 FlatStyle = FlatStyle.Flat
             };
             btnCreateReport.Click += BtnCreateReport_Click;
+            navGroup.Controls.Add(btnCreateReport);
 
             btnTemplates = new Button
             {
                 Text = "📄 Редактор шаблонов",
-                Location = new Point(startX + buttonWidth + spacing, currentY),
+                Location = new Point(startX + buttonWidth + spacing, startY),
                 Size = new Size(buttonWidth, buttonHeight),
                 BackColor = Color.LightBlue,
                 FlatStyle = FlatStyle.Flat
             };
             btnTemplates.Click += BtnTemplates_Click;
+            navGroup.Controls.Add(btnTemplates);
 
             btnSettings = new Button
             {
                 Text = "⚙️ Настройки",
-                Location = new Point(startX + (buttonWidth + spacing) * 2, currentY),
+                Location = new Point(startX, startY + buttonHeight + spacing),
                 Size = new Size(buttonWidth, buttonHeight),
                 BackColor = Color.LightBlue,
                 FlatStyle = FlatStyle.Flat
             };
             btnSettings.Click += BtnSettings_Click;
+            navGroup.Controls.Add(btnSettings);
 
             Button btnHelp = new Button
             {
                 Text = "❓ Справка",
-                Location = new Point(startX + (buttonWidth + spacing) * 3, currentY),
+                Location = new Point(startX + buttonWidth + spacing, startY + buttonHeight + spacing),
                 Size = new Size(buttonWidth, buttonHeight),
                 BackColor = Color.LightBlue,
                 FlatStyle = FlatStyle.Flat
             };
             btnHelp.Click += BtnHelp_Click;
+            navGroup.Controls.Add(btnHelp);
 
-            this.Controls.Add(btnCreateReport);
-            this.Controls.Add(btnTemplates);
-            this.Controls.Add(btnSettings);
-            this.Controls.Add(btnHelp);
-            currentY += buttonHeight + 15;
-
-            // ===== КНОПКИ РАБОТЫ С ДАННЫМИ (ВТОРОЙ РЯД) =====
+            // ===== КНОПКИ УПРАВЛЕНИЯ ДАННЫМИ (ПРАВАЯ ПАНЕЛЬ) =====
             btnAdd = new Button
             {
                 Text = "➕ Добавить",
-                Location = new Point(startX, currentY),
+                Location = new Point(startX, startY),
                 Size = new Size(buttonWidth, buttonHeight),
                 BackColor = Color.LightGreen,
                 FlatStyle = FlatStyle.Flat
             };
             btnAdd.Click += BtnAdd_Click;
+            dataGroup.Controls.Add(btnAdd);
 
             btnEdit = new Button
             {
                 Text = "✏️ Редактировать",
-                Location = new Point(startX + buttonWidth + spacing, currentY),
+                Location = new Point(startX + buttonWidth + spacing, startY),
                 Size = new Size(buttonWidth, buttonHeight),
                 BackColor = Color.LightGreen,
                 FlatStyle = FlatStyle.Flat
             };
             btnEdit.Click += BtnEdit_Click;
+            dataGroup.Controls.Add(btnEdit);
 
             btnDelete = new Button
             {
                 Text = "🗑️ Удалить",
-                Location = new Point(startX + (buttonWidth + spacing) * 2, currentY),
+                Location = new Point(startX, startY + buttonHeight + spacing),
                 Size = new Size(buttonWidth, buttonHeight),
                 BackColor = Color.LightCoral,
                 FlatStyle = FlatStyle.Flat
             };
             btnDelete.Click += BtnDelete_Click;
+            dataGroup.Controls.Add(btnDelete);
 
             btnRefresh = new Button
             {
                 Text = "🔄 Обновить",
-                Location = new Point(startX + (buttonWidth + spacing) * 3, currentY),
+                Location = new Point(startX + buttonWidth + spacing, startY + buttonHeight + spacing),
                 Size = new Size(buttonWidth, buttonHeight),
                 BackColor = Color.LightYellow,
                 FlatStyle = FlatStyle.Flat
             };
             btnRefresh.Click += BtnRefresh_Click;
+            dataGroup.Controls.Add(btnRefresh);
 
-            this.Controls.Add(btnAdd);
-            this.Controls.Add(btnEdit);
-            this.Controls.Add(btnDelete);
-            this.Controls.Add(btnRefresh);
-            currentY += buttonHeight + 15;
+            currentY += panelHeight + 15;
 
-            // ===== КАЛЕНДАРЬ (ПРАВЫЙ НИЖНИЙ УГОЛ) =====
+            // ===== КАЛЕНДАРЬ =====
             MonthCalendar monthCalendar = new MonthCalendar
             {
                 Name = "monthCalendar",
-                Location = new Point(810, currentY - buttonHeight*2-30),
+                Location = new Point(810, currentY - buttonHeight * 2 - 48),
                 MaxSelectionCount = 1,
                 ShowToday = true,
                 ShowTodayCircle = true,
@@ -241,7 +267,8 @@ namespace ДипП
             };
             monthCalendar.DateSelected += MonthCalendar_DateSelected;
             this.Controls.Add(monthCalendar);
-            this.Size = new Size(1000, currentY+ monthCalendar.Size.Height -50);
+
+            this.Size = new Size(1000, currentY + monthCalendar.Size.Height - 50);
             InitStorageAndDate();
         }
 
@@ -290,12 +317,17 @@ namespace ДипП
 
         private void BtnTemplates_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Функция редактирования шаблонов находится в разработке");
+            var manager = new TemplateManagerForm();
+            manager.ShowDialog();
         }
 
         private void BtnSettings_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Функция настроек находится в разработке");
+            var settingsForm = new SettingsForm(_settingsService, _organizationName);
+            if (settingsForm.ShowDialog() == DialogResult.OK)
+            {
+                _organizationName = _settingsService.GetOrganizationName();
+            }
         }
 
         private void BtnAdd_Click(object sender, EventArgs e)
@@ -403,53 +435,151 @@ namespace ДипП
             {
                 Cursor = Cursors.WaitCursor;
 
-                // Получаем события за выбранный месяц
-                var startDate = new DateTime(date.Year, date.Month, 1);
-                var endDate = startDate.AddMonths(1).AddDays(-1);
+                // Определяем диапазон дат
+                DateTime startDate, endDate;
+                switch (template.PeriodType)
+                {
+                    case "day":
+                        startDate = date.Date;
+                        endDate = date.Date;
+                        break;
+                    case "month":
+                        startDate = new DateTime(date.Year, date.Month, 1);
+                        endDate = startDate.AddMonths(1).AddDays(-1);
+                        break;
+                    case "year":
+                        startDate = new DateTime(date.Year, 1, 1);
+                        endDate = new DateTime(date.Year, 12, 31);
+                        break;
+                    default:
+                        startDate = new DateTime(date.Year, date.Month, 1);
+                        endDate = startDate.AddMonths(1).AddDays(-1);
+                        break;
+                }
 
-                var events = _dataRepository.GetByType("event")
+                // Загружаем хранилище
+                var storageConfigs = new StorageConfigService().LoadAll();
+                var targetStorage = storageConfigs.FirstOrDefault(s => s.Id == template.StorageId);
+
+                if (targetStorage == null)
+                {
+                    MessageBox.Show($"Для шаблона \"{template.DisplayName}\" не указано хранилище данных",
+                                   "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                var repo = new DataRepository(targetStorage.FilePath);
+                repo.Load();
+
+                // 1. ПОЛУЧАЕМ СОБЫТИЯ ЗА ПЕРИОД
+                var events = repo.GetByType(targetStorage.Type)
                     .Where(e =>
                     {
                         if (DateTime.TryParse(e.Date, out DateTime eventDate))
-                        {
                             return eventDate >= startDate && eventDate <= endDate;
-                        }
                         return false;
                     })
                     .ToList();
 
-                // Формируем поля
-                var fields = new Dictionary<string, string>
-                {
-                    ["OrganizationName"] = "Алексеевский СДК",
-                    ["Month"] = date.ToString("MMMM"),
-                    ["Year"] = date.Year.ToString()
-                };
+                // 2. ФОРМИРУЕМ ТЕКСТОВЫЕ ПОЛЯ (ОДИН ЦИКЛ)
+                var textFields = new Dictionary<string, string>();
 
-                // Преобразуем события в строки
-                var rows = new List<Dictionary<string, string>>();
+                foreach (var mapping in template.TextFieldMappings)
+                {
+                    string markerKey = mapping.Key;
+                    var fieldMapping = mapping.Value;
+                    string value = "";
+
+                    if (fieldMapping.IsStatic)
+                    {
+                        value = fieldMapping.StaticValue ?? "";
+                    }
+                    else if (fieldMapping.IsAggregate)
+                    {
+                        if (fieldMapping.AggregateType == "OrganizationName")
+                        {
+                            value = _organizationName;
+                            Console.WriteLine($"OrganizationName = {value}");
+                        }
+                        else if (fieldMapping.AggregateType == "AutoNumber")
+                        {
+                            continue;
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(fieldMapping.StorageField))
+                    {
+                        string storageField = fieldMapping.StorageField;
+
+                        if (storageField == "Month")
+                        {
+                            value = date.ToString("MMMM");
+                        }
+                        else if (storageField == "Year")
+                        {
+                            value = date.Year.ToString();
+                        }
+                        else if (events.Count > 0 && events[0].Fields.ContainsKey(storageField))
+                        {
+                            value = events[0].Fields[storageField]?.ToString() ?? "";
+                            if (!string.IsNullOrEmpty(fieldMapping.DateFormat))
+                            {
+                                value = DateHelper.FormatDateValue(value, fieldMapping.DateFormat);
+                            }
+                        }
+                    }
+
+                    textFields[markerKey] = value;
+                    Console.WriteLine($"Добавлено: {markerKey} = {value}");
+                }
+
+                // 3. ФОРМИРУЕМ ТАБЛИЧНЫЕ ДАННЫЕ
+                var tableData = new List<Dictionary<string, string>>();
+
                 foreach (var ev in events)
                 {
                     var row = new Dictionary<string, string>();
-                    foreach (var col in template.TableColumns)
+                    foreach (var mapping in template.TableFieldMappings)
                     {
-                        if (ev.Fields.ContainsKey(col))
-                            row[col] = ev.Fields[col]?.ToString() ?? "";
+                        string markerKey = mapping.Key;
+                        var fieldMapping = mapping.Value;
+
+                        if (fieldMapping.IsStatic)
+                        {
+                            row[markerKey] = fieldMapping.StaticValue ?? "";
+                        }
+                        else if (!string.IsNullOrEmpty(fieldMapping.StorageField))
+                        {
+                            string storageField = fieldMapping.StorageField;
+                            if (ev.Fields.ContainsKey(storageField))
+                            {
+                                string value = ev.Fields[storageField]?.ToString() ?? "";
+                                if (!string.IsNullOrEmpty(fieldMapping.DateFormat))
+                                {
+                                    value = DateHelper.FormatDateValue(value, fieldMapping.DateFormat);
+                                }
+                                row[markerKey] = value;
+                            }
+                            else
+                            {
+                                row[markerKey] = "";
+                            }
+                        }
+                        else
+                        {
+                            row[markerKey] = "";
+                        }
                     }
-                    rows.Add(row);
+                    tableData.Add(row);
                 }
 
                 var docService = new DocumentService();
-                string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Res", "Templates", template.TemplateFile);
+                string tempOutputPath = docService.GenerateReport(template, textFields, tableData, date);
 
-                string tempOutputPath = docService.GenerateTestReport(template, fields, rows);
-
-                // Диалог сохранения
                 SaveFileDialog saveFileDialog = new SaveFileDialog
                 {
                     Title = "Сохранить отчет",
-                    Filter = "Документ Word (*.docx)|*.docx|Все файлы (*.*)|*.*",
-                    FileName = $"{template.DisplayName}_{date:yyyy-MM}.docx",
+                    Filter = "Документ Word (*.docx)|*.docx",
+                    FileName = $"{template.DisplayName}_{date:yyyy-MM-dd}.docx",
                     DefaultExt = "docx"
                 };
 
@@ -457,20 +587,20 @@ namespace ДипП
                 {
                     File.Copy(tempOutputPath, saveFileDialog.FileName, true);
                     File.Delete(tempOutputPath);
-
-                    MessageBox.Show($"✅ Отчет сохранен:\n{saveFileDialog.FileName}", "Успех");
+                    MessageBox.Show($"Отчет сохранен:\n{saveFileDialog.FileName}", "Успех",
+                                   MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"❌ Ошибка: {ex.Message}");
+                MessageBox.Show($"Ошибка при формировании отчета:\n{ex.Message}", "Ошибка",
+                               MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
                 Cursor = Cursors.Default;
             }
         }
-
         private void DisplayEvents(List<DataEntity> events)
         {
             if (events == null || events.Count == 0)
@@ -644,12 +774,6 @@ namespace ДипП
             }
         }
 
-        private void DtpPeriod_ValueChanged(object sender, EventArgs e)
-        {
-            var dtp = sender as DateTimePicker;
-            _currentDate = dtp.Value;
-            LoadDataByDate(_currentDate);
-        }
         private void LoadDataByDate(DateTime date)
         {
             try

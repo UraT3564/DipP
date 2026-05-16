@@ -1,12 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ДипП.Models;
 
 namespace ДипП.Services
 {
     public class ReportCalculator
     {
+        private bool IsNumericColumn(string columnName, StorageConfig storageConfig)
+        {
+            var field = storageConfig.Fields.FirstOrDefault(f => f.Key == columnName);
+            return field?.Type == "number";
+        }
 
+        public decimal SumColumn(List<Dictionary<string, string>> rows, string columnName, StorageConfig storageConfig)
+        {
+            if (!IsNumericColumn(columnName, storageConfig)) return 0;
+
+            decimal sum = 0;
+            foreach (var row in rows)
+            {
+                if (row.ContainsKey(columnName) && decimal.TryParse(row[columnName], out decimal value))
+                {
+                    sum += value;
+                }
+            }
+            return sum;
+        }
         /// Подсчет суммы по указанной колонке
         public decimal SumColumn(List<Dictionary<string, string>> rows, string columnName)
         {

@@ -15,7 +15,6 @@ namespace ДипП
         private StorageConfig _storageConfig;
         private bool _isEdit;
 
-        // Конструктор для добавления — анализируем все существующие события
         public EventEditForm(DataRepository repository, StorageConfig storageConfig, DataEntity existingEvent = null)
         {
             _repository = repository;
@@ -38,8 +37,7 @@ namespace ДипП
 
         private void SetupForm()
         {
-            bool isEdit = _event.Fields.Count > 0;
-            this.Text = isEdit ? "Редактирование записи" : "Добавление записи";
+            this.Text = _isEdit ? "Редактирование записи" : "Добавление записи";
             this.Size = new Size(500, 550);
             this.StartPosition = FormStartPosition.CenterParent;
             this.Font = new Font("Segoe UI", 10);
@@ -52,10 +50,10 @@ namespace ДипП
             int controlWidth = 270;
             int leftMargin = 15;
 
-            // Поле даты (обязательное)
+            // Поле даты (для _event.Date)
             Label lblDate = new Label
             {
-                Text = "Дата (YYYY-MM-DD):",
+                Text = "Дата (ГГГГ-ММ-ДД):",
                 Location = new Point(leftMargin, y),
                 Size = new Size(labelWidth, 25),
                 TextAlign = ContentAlignment.MiddleRight
@@ -72,61 +70,63 @@ namespace ДипП
             _fieldControls["Date"] = txtDate;
             y += 35;
 
-            // Получаем все возможные ключи из всех event-записей в хранилище
-            var allEvents = _repository.GetByType("event");
-            var allKeys = new HashSet<string>();
-
-            foreach (var ev in allEvents)
-            {
-                foreach (var key in ev.Fields.Keys)
-                {
-                    allKeys.Add(key);
-                }
-            }
-
-            // Если ключей нет (пустое хранилище) — используем стандартный набор
-            if (allKeys.Count == 0)
-            {
-                allKeys.Add("EventName");
-                allKeys.Add("Participants");
-                allKeys.Add("Location");
-                allKeys.Add("Responsible");
-                allKeys.Add("EventLink");
-                allKeys.Add("Children0to14");
-                allKeys.Add("Children14to35");
-                allKeys.Add("AdultsOver35");
-            }
-
-            // Сортируем ключи для удобства
-            //var orderedKeys = allKeys.OrderBy(k => k).ToList();
-
-            // Создаем поля для каждого ключа
+            // Остальные поля из конфига
             foreach (var fieldConfig in _storageConfig.Fields)
             {
+                string displayName = fieldConfig.Display;
+                string fieldKey = fieldConfig.Key;
+
                 Label lbl = new Label
                 {
-                    Text = fieldConfig.Display + ":",
+                    Text = displayName + ":",
                     Location = new Point(leftMargin, y),
                     Size = new Size(labelWidth, 25),
                     TextAlign = ContentAlignment.MiddleRight
                 };
-
-                TextBox txt = new TextBox
-                {
-                    Name = fieldConfig.Key,
-                    Location = new Point(leftMargin + labelWidth + 5, y),
-                    Size = new Size(controlWidth, 25)
-                };
-
                 this.Controls.Add(lbl);
-                this.Controls.Add(txt);
-                _fieldControls[fieldConfig.Key] = txt;
+
+                Control inputControl;
+
+                if (fieldConfig.Type == "date")
+                {
+                    DateTimePicker dtp = new DateTimePicker
+                    {
+                        Name = fieldKey,
+                        Location = new Point(leftMargin + labelWidth + 5, y),
+                        Size = new Size(controlWidth, 25),
+                        Format = DateTimePickerFormat.Custom,
+                        CustomFormat = "dd.MM.yyyy"
+                    };
+                    inputControl = dtp;
+                }
+                else if (fieldConfig.Type == "link")
+                {
+                    TextBox txt = new TextBox
+                    {
+                        Name = fieldKey,
+                        Location = new Point(leftMargin + labelWidth + 5, y),
+                        Size = new Size(controlWidth, 25)
+                    };
+                    inputControl = txt;
+                }
+                else
+                {
+                    TextBox txt = new TextBox
+                    {
+                        Name = fieldKey,
+                        Location = new Point(leftMargin + labelWidth + 5, y),
+                        Size = new Size(controlWidth, 25)
+                    };
+                    inputControl = txt;
+                }
+
+                this.Controls.Add(inputControl);
+                _fieldControls[fieldKey] = inputControl;
                 y += 35;
             }
 
-            y += 20;
-
             // Кнопки
+            y += 10;
             Button btnSave = new Button
             {
                 Text = "Сохранить",
@@ -136,6 +136,7 @@ namespace ДипП
                 FlatStyle = FlatStyle.Flat
             };
             btnSave.Click += BtnSave_Click;
+            this.Controls.Add(btnSave);
 
             Button btnCancel = new Button
             {
@@ -146,8 +147,6 @@ namespace ДипП
                 FlatStyle = FlatStyle.Flat
             };
             btnCancel.Click += (s, e) => this.DialogResult = DialogResult.Cancel;
-
-            this.Controls.Add(btnSave);
             this.Controls.Add(btnCancel);
 
             this.Height = y + 100;
@@ -155,17 +154,34 @@ namespace ДипП
 
         private void LoadEventData()
         {
-            if (_event.Fields.Count == 0) return;
+            if (_event.Fields.Count == 0 && _event.Date != null)
+            {
+                // Только дата
+                if (_fieldControls.ContainsKey("Date") && _fieldControls["Date"] is TextBox txtDate)
+                    txtDate.Text = _event.Date;
+                return;
+            }
 
             foreach (var field in _fieldControls)
             {
                 if (field.Key == "Date")
                 {
-                    ((TextBox)field.Value).Text = _event.Date;
+                    if (field.Value is TextBox txtDate)
+                        txtDate.Text = _event.Date;
                 }
                 else if (_event.Fields.ContainsKey(field.Key))
                 {
-                    ((TextBox)field.Value).Text = _event.Fields[field.Key]?.ToString() ?? "";
+                    object value = _event.Fields[field.Key]?.ToString() ?? "";
+
+                    if (field.Value is TextBox txt)
+                    {
+                        txt.Text = value.ToString();
+                    }
+                    else if (field.Value is DateTimePicker dtp)
+                    {
+                        if (DateTime.TryParse(value.ToString(), out DateTime parsedDate))
+                            dtp.Value = parsedDate;
+                    }
                 }
             }
         }
@@ -184,7 +200,7 @@ namespace ДипП
                 }
             }
 
-            // Сохраняем дату
+            // Сохраняем дату из текстового поля Date
             string selectedDate = "";
             if (_fieldControls.ContainsKey("Date") && _fieldControls["Date"] is TextBox txtDate)
             {
@@ -192,17 +208,15 @@ namespace ДипП
                 {
                     selectedDate = parsedDate.ToString("yyyy-MM-dd");
                     _event.Date = selectedDate;
-                    _event.Fields["EventDate"] = parsedDate.ToString("dd.MM.yyyy");
                 }
                 else
                 {
                     selectedDate = DateTime.Now.ToString("yyyy-MM-dd");
                     _event.Date = selectedDate;
-                    _event.Fields["EventDate"] = DateTime.Now.ToString("dd.MM.yyyy");
                 }
             }
 
-            // Проверка на дубликат (при добавлении нового события)
+            // Проверка на дубликат
             if (!_isEdit)
             {
                 string eventName = "";
@@ -221,9 +235,7 @@ namespace ДипП
                         $"В этот день уже есть событие с таким названием:\n\n" +
                         $"Дата: {selectedDate}\n" +
                         $"Название: {eventName}\n\n" +
-                        $"Выберите действие:\n" +
-                        $"• Если хотите изменить существующее — нажмите 'Отмена' и выберите его для редактирования\n" +
-                        $"• Если хотите добавить новое — измените название или дату",
+                        $"Измените название или дату",
                         "Обнаружен дубликат",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Warning);
@@ -231,14 +243,19 @@ namespace ДипП
                 }
             }
 
-            // Сохраняем остальные поля...
+            // Сохраняем остальные поля
             foreach (var field in _fieldControls)
             {
                 if (field.Key == "Date") continue;
+
                 if (field.Value is TextBox txt)
                 {
                     string value = txt.Text;
                     _event.Fields[field.Key] = string.IsNullOrEmpty(value) ? "" : value;
+                }
+                else if (field.Value is DateTimePicker dtp)
+                {
+                    _event.Fields[field.Key] = dtp.Value.ToString("dd.MM.yyyy");
                 }
             }
 
