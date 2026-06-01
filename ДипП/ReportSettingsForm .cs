@@ -25,6 +25,8 @@ namespace ДипП
 
         public ReportSettingsForm(List<TemplateConfig> templates, DataRepository repository)
         {
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;  // запрещает растягивание
+            this.MaximizeBox = false;
             InitializeComponent();
             _templates = templates;
             _repository = repository;

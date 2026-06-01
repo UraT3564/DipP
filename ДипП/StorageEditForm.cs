@@ -26,6 +26,8 @@ namespace ДипП
 
         public StorageEditForm(StorageConfigService configService, StorageConfig existingStorage = null)
         {
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;  // запрещает растягивание
+            this.MaximizeBox = false;
             _configService = configService;
             _storage = existingStorage ?? new StorageConfig
             {

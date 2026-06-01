@@ -22,6 +22,8 @@ namespace ДипП
 
         private void InitializeComponent()
         {
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;  // запрещает растягивание
+            this.MaximizeBox = false;
             this.Text = "Настройки";
             this.Size = new Size(450, 150);
             this.StartPosition = FormStartPosition.CenterParent;

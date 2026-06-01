@@ -118,6 +118,8 @@ namespace ДипП
 
         private void InitializeComponent()
         {
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;  // запрещает растягивание
+            this.MaximizeBox = false;
             this.Text = _isEditMode ? "Редактирование шаблона" : "Создание шаблона";
             this.Size = new Size(850, 750);
             this.StartPosition = FormStartPosition.CenterParent;

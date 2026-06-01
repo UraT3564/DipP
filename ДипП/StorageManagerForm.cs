@@ -31,6 +31,8 @@ namespace ДипП
 
         private void InitializeComponent()
         {
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;  // запрещает растягивание
+            this.MaximizeBox = false;
             this.Text = "Управление хранилищами";
             this.Size = new Size(700, 550);
             this.StartPosition = FormStartPosition.CenterParent;

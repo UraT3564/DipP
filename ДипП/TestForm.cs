@@ -32,6 +32,8 @@ namespace ДипП
         private string _organizationName;
         public TestForm()
         {
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;  // запрещает растягивание
+            this.MaximizeBox = false;
             InitializeComponent();
             _configService = new ConfigService();
             _dataRepository = new DataRepository();

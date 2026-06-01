@@ -34,7 +34,9 @@ namespace ДипП
 
         private void InitializeComponent()
         {
-            this.Text = "Управление шаблонами отчетов";
+			this.FormBorderStyle = FormBorderStyle.FixedSingle;  // запрещает растягивание
+			this.MaximizeBox = false;
+			this.Text = "Управление шаблонами отчетов";
             this.Size = new Size(550, 410 );
             this.StartPosition = FormStartPosition.CenterParent;
             this.MinimumSize = new Size(500, 300);

@@ -17,6 +17,8 @@ namespace ДипП
 
         public EventEditForm(DataRepository repository, StorageConfig storageConfig, DataEntity existingEvent = null)
         {
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;  // запрещает растягивание
+            this.MaximizeBox = false;
             _repository = repository;
             _storageConfig = storageConfig;
             _event = existingEvent ?? new DataEntity
