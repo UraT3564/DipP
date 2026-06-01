@@ -83,5 +83,67 @@ namespace ДипП.Services
                 throw;
             }
         }
+        // ===== НОВЫЕ МЕТОДЫ =====
+
+        public void AddStorage(StorageConfig storage)
+        {
+            var storages = LoadAll();
+            storage.Id = Guid.NewGuid().ToString(); // генерируем уникальный ID
+            storages.Add(storage);
+            SaveAll(storages);
+        }
+
+        public void UpdateStorage(StorageConfig storage)
+        {
+            var storages = LoadAll();
+            int index = storages.FindIndex(s => s.Id == storage.Id);
+            if (index >= 0)
+            {
+                storages[index] = storage;
+                SaveAll(storages);
+            }
+        }
+
+        public void DeleteStorage(string id)
+        {
+            var storages = LoadAll();
+            storages.RemoveAll(s => s.Id == id);
+            SaveAll(storages);
+        }
+
+
+        // Создание пустого файла данных для хранилища
+        public void CreateDataFileIfNotExists(string filePath)
+        {
+            // Защита от null или пустого пути
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                Console.WriteLine("[StorageConfigService] Путь к файлу не указан");
+                return;
+            }
+
+            string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filePath);
+            string directory = Path.GetDirectoryName(fullPath);
+
+            // Проверка и создание директории
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+                Console.WriteLine($"[StorageConfigService] Создана директория: {directory}");
+            }
+
+            // Создание файла, если его нет
+            if (!File.Exists(fullPath))
+            {
+                File.WriteAllText(fullPath, "[]", Encoding.UTF8);
+                Console.WriteLine($"[StorageConfigService] Создан файл: {fullPath}");
+            }
+        }
+    }
+
+    // Класс-обертка для корневого объекта JSON
+    public class StorageConfigRoot
+    {
+        public List<StorageConfig> Storages { get; set; }
     }
 }

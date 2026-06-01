@@ -133,7 +133,7 @@ namespace ДипП
 
             // ===== ОБЛАСТЬ КНОПОК (РАЗДЕЛЕННАЯ НА ДВЕ КОЛОНКИ) =====
             int panelWidth = 760;
-            int panelHeight = 140;
+            int panelHeight = 210;
             int halfWidth = (panelWidth - 10) / 2; // с отступом между колонками
 
             // Левая панель: Навигация
@@ -206,6 +206,16 @@ namespace ДипП
             };
             btnHelp.Click += BtnHelp_Click;
             navGroup.Controls.Add(btnHelp);
+            Button btnStorage = new Button
+            {
+                Text = "🗄️ Хранилища",
+                Location = new Point(startX, startY + (buttonHeight + spacing) * 2), // третий ряд, левая колонка
+                Size = new Size(buttonWidth, buttonHeight),
+                BackColor = Color.LightBlue,
+                FlatStyle = FlatStyle.Flat
+            };
+            btnStorage.Click += BtnStorageManager_Click;
+            navGroup.Controls.Add(btnStorage);
 
             // ===== КНОПКИ УПРАВЛЕНИЯ ДАННЫМИ (ПРАВАЯ ПАНЕЛЬ) =====
             btnAdd = new Button
@@ -258,7 +268,7 @@ namespace ДипП
             MonthCalendar monthCalendar = new MonthCalendar
             {
                 Name = "monthCalendar",
-                Location = new Point(810, currentY - buttonHeight * 2 - 48),
+                Location = new Point(810, currentY - buttonHeight * 3 - 48),
                 MaxSelectionCount = 1,
                 ShowToday = true,
                 ShowTodayCircle = true,
@@ -268,7 +278,7 @@ namespace ДипП
             monthCalendar.DateSelected += MonthCalendar_DateSelected;
             this.Controls.Add(monthCalendar);
 
-            this.Size = new Size(1000, currentY + monthCalendar.Size.Height - 50);
+            this.Size = new Size(1000, currentY + monthCalendar.Size.Height - 115);
             InitStorageAndDate();
         }
 
@@ -429,6 +439,30 @@ namespace ДипП
             LoadCurrentMonthData();
         }
 
+        private void BtnStorageManager_Click(object sender, EventArgs e)
+        {
+            var storageConfigService = new StorageConfigService();
+            var managerForm = new StorageManagerForm(storageConfigService, _dataRepository);
+            managerForm.ShowDialog();
+
+            // После закрытия формы обновляем список хранилищ в комбобоксе
+            var storageConfigs = storageConfigService.LoadAll();
+            _allStorageConfigs = storageConfigs;
+
+            var cmb = this.Controls["cmbStorage"] as ComboBox;
+            if (cmb != null && _allStorageConfigs != null)
+            {
+                cmb.DataSource = null;
+                cmb.DataSource = _allStorageConfigs;
+                cmb.DisplayMember = "DisplayName";
+                cmb.ValueMember = "Id";
+                if (cmb.Items.Count > 0 && _currentStorageConfig != null)
+                {
+                    cmb.SelectedItem = _currentStorageConfig;
+                }
+            }
+        }
+        
         private void GenerateReport(TemplateConfig template, DateTime date)
         {
             try
@@ -601,6 +635,7 @@ namespace ДипП
                 Cursor = Cursors.Default;
             }
         }
+        
         private void DisplayEvents(List<DataEntity> events)
         {
             if (events == null || events.Count == 0)
