@@ -33,7 +33,7 @@ namespace ДипП
         public TestForm()
         {
             this.FormBorderStyle = FormBorderStyle.FixedSingle;  // запрещает растягивание
-            this.MaximizeBox = false;
+this.MaximizeBox = false;  
             InitializeComponent();
             _configService = new ConfigService();
             _dataRepository = new DataRepository();

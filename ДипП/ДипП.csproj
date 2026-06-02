@@ -158,18 +158,15 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventEditForm.cs">
+    <Compile Include="Forms\EventEditForm.cs">
       <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="EventEditForm.Designer.cs">
-      <DependentUpon>EventEditForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Models\StorageConfig.cs" />
     <Compile Include="Models\TableInfo.cs" />
-    <Compile Include="ReportSettingsForm .cs">
+    <Compile Include="Forms\ReportSettingsForm .cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ReportSettingsForm .Designer.cs">
+    <Compile Include="Forms\ReportSettingsForm .Designer.cs">
       <DependentUpon>ReportSettingsForm .cs</DependentUpon>
     </Compile>
     <Compile Include="Services\DataRepository.cs" />
@@ -184,26 +181,23 @@
     <Compile Include="Services\ReportCalculator.cs" />
     <Compile Include="Services\SettingsService.cs" />
     <Compile Include="Services\StorageConfigService.cs" />
-    <Compile Include="SettingsForm.cs">
+    <Compile Include="Forms\SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="StorageEditForm.cs">
+    <Compile Include="Forms\StorageEditForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="StorageManagerForm.cs">
+    <Compile Include="Forms\StorageManagerForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TemplateManagerForm.cs">
+    <Compile Include="Forms\TemplateManagerForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TemplateWizardForm.cs">
+    <Compile Include="Forms\TemplateWizardForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="TestForm.cs">
+    <Compile Include="Forms\TestForm.cs">
       <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="TestForm.Designer.cs">
-      <DependentUpon>TestForm.cs</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

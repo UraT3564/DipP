@@ -25,9 +25,8 @@ namespace ДипП
         private Button btnCancel;
 
         public StorageEditForm(StorageConfigService configService, StorageConfig existingStorage = null)
-        {
-            this.FormBorderStyle = FormBorderStyle.FixedSingle;  // запрещает растягивание
-            this.MaximizeBox = false;
+        {this.FormBorderStyle = FormBorderStyle.FixedSingle;  // запрещает растягивание
+this.MaximizeBox = false;  
             _configService = configService;
             _storage = existingStorage ?? new StorageConfig
             {
@@ -88,27 +87,7 @@ namespace ДипП
             grpMain.Controls.Add(txtDisplayName);
             gy += 35;
 
-            // Путь к файлу
-            Label lblFilePath = new Label
-            {
-                Text = "Путь к файлу (авто):",
-                Location = new Point(10, gy),
-                Size = new Size(labelWidth, 25),
-                TextAlign = ContentAlignment.MiddleRight
-            };
-            grpMain.Controls.Add(lblFilePath);
-
-            txtFilePath = new TextBox
-            {
-                Location = new Point(labelWidth + 15, gy),
-                Size = new Size(controlWidth, 25),
-                ReadOnly = true,
-                BackColor = Color.LightGray,
-                Text = _storage.FilePath ?? ""  // будет заполнено автоматически
-            };
-            grpMain.Controls.Add(txtFilePath);
-
-            // Тип сущности
+            // Тип сущности (только один раз!)
             Label lblType = new Label
             {
                 Text = "Тип сущности:",
@@ -125,9 +104,28 @@ namespace ДипП
                 Text = _storage.Type ?? "event"
             };
             grpMain.Controls.Add(txtType);
+            gy += 35;
 
+            // Путь к файлу (авто)
+            Label lblFilePath = new Label
+            {
+                Text = "Путь к файлу (авто):",
+                Location = new Point(10, gy),
+                Size = new Size(labelWidth, 25),
+                TextAlign = ContentAlignment.MiddleRight
+            };
+            grpMain.Controls.Add(lblFilePath);
+
+            txtFilePath = new TextBox
+            {
+                Location = new Point(labelWidth + 15, gy),
+                Size = new Size(controlWidth, 25),
+                ReadOnly = true,
+                BackColor = Color.LightGray,
+                Text = _storage.FilePath ?? ""
+            };
+            grpMain.Controls.Add(txtFilePath);
             y = grpMain.Bottom + 15;
-
             // ===== Поля хранилища =====
             GroupBox grpFields = new GroupBox
             {

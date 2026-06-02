@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
-using Newtonsoft.Json;
 using ДипП.Models;
 
 namespace ДипП.Services
@@ -104,11 +105,28 @@ namespace ДипП.Services
             }
         }
 
-        public void DeleteStorage(string id)
+        public void DeleteStorage(string id, bool deleteFile = true)
         {
             var storages = LoadAll();
+            var storageToDelete = storages.FirstOrDefault(s => s.Id == id);
+
+            if (storageToDelete == null)
+            {
+                Console.WriteLine($"[StorageConfigService] Хранилище с Id={id} не найдено");
+                return;
+            }
+
+            // Удаляем файл данных
+            if (deleteFile && !string.IsNullOrEmpty(storageToDelete.FilePath))
+            {
+                DeleteStorageFile(storageToDelete.FilePath);
+            }
+
+            // Удаляем запись из конфигурации
             storages.RemoveAll(s => s.Id == id);
             SaveAll(storages);
+
+            Console.WriteLine($"[StorageConfigService] Удалено хранилище {storageToDelete.DisplayName}");
         }
 
 
@@ -137,6 +155,21 @@ namespace ДипП.Services
             {
                 File.WriteAllText(fullPath, "[]", Encoding.UTF8);
                 Console.WriteLine($"[StorageConfigService] Создан файл: {fullPath}");
+            }
+        }
+
+        public void DeleteStorageFile(string filePath)
+        {
+            string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, filePath);
+
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+                Console.WriteLine($"[StorageConfigService] Файл удален: {fullPath}");
+            }
+            else
+            {
+                Console.WriteLine($"[StorageConfigService] Файл не найден: {fullPath}");
             }
         }
     }

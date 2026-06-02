@@ -246,19 +246,22 @@ namespace ДипП
                 return;
             }
 
-            var result = MessageBox.Show($"Удалить хранилище \"{_selectedStorage.DisplayName}\"?\n\n" +
-                "ВНИМАНИЕ: Файл данных НЕ будет удален. Вы сможете подключить его позже.\n" +
-                "Удалить запись о хранилище?",
-                "Подтверждение удаления",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Question);
+            string message = $"Удалить хранилище \"{_selectedStorage.DisplayName}\"?\n\n" +
+                "Файл данных будет удален без возможности восстановления.\n" +
+                "Резервная копия (если есть) останется на диске.\n\n" +
+                "Продолжить?";
+
+            var result = MessageBox.Show(message, "Подтверждение удаления",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
             {
                 _configService.DeleteStorage(_selectedStorage.Id);
                 LoadStorages();
-                MessageBox.Show("Хранилище удалено из конфигурации", "Успех",
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Хранилище удалено.\n\n" +
+                    "Файл данных удален.\n" +
+                    "Резервная копия (файл .backup) осталась на диске.",
+                    "Успех", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
