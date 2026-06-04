@@ -27,9 +27,6 @@ namespace ДипП
 
             // Запускаем тестовую форму
             Application.Run(new TestForm());
-
-            // После успешного теста замените на:
-            // Application.Run(new MainForm());
         }
 
         [DllImport("kernel32.dll", SetLastError = true)]
