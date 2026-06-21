@@ -128,6 +128,7 @@ namespace ДипП
 
         private void SetupForm()
         {
+            this.Icon = new Icon(System.IO.Path.Combine(Application.StartupPath, "Res\\icons8.ico"));
             TableLayoutPanel mainLayout = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
@@ -610,7 +611,7 @@ namespace ДипП
             };
             if (_selectedStorage != null)
             {
-                cmbStorageField.Items.AddRange(_selectedStorage.Fields.Select(f => f.Key).ToArray());
+                cmbStorageField.Items.AddRange(_selectedStorage.Fields.Select(f => f.Id.ToString()).ToArray());
                 cmbStorageField.Items.Insert(0, "(не выбрано)");
             }
             valuePanel.Controls.Add(cmbStorageField);
@@ -664,7 +665,7 @@ namespace ДипП
                 if (selectedType == "📁 Данные из хранилища")
                 {
                     cmbStorageField.Visible = true;
-                    cmbStorageField.SelectedItem = !string.IsNullOrEmpty(mapping.StorageField) ? mapping.StorageField : "(не выбрано)";
+                    cmbStorageField.SelectedItem = !string.IsNullOrEmpty(mapping.StorageFieldId) ? mapping.StorageFieldId : "(не выбрано)";
                 }
             }
             else
@@ -731,7 +732,7 @@ namespace ДипП
             {
                 if (selectedType == "📁 Данные из хранилища")
                 {
-                    mapping.StorageField = cmbStorageField.SelectedItem?.ToString();
+                    mapping.StorageFieldId = cmbStorageField.SelectedItem?.ToString();
                 }
                 else if (selectedType == "🔢 Автонумерация")
                 {
@@ -1123,8 +1124,8 @@ namespace ДипП
                     info = $"статическое: {mapping.StaticValue}";
                 else if (!string.IsNullOrEmpty(mapping.DateFormat))
                     info = $"дата: {mapping.DateFormat}";
-                else if (!string.IsNullOrEmpty(mapping.StorageField))
-                    info = $"из хранилища: {mapping.StorageField}";
+                else if (!string.IsNullOrEmpty(mapping.StorageFieldId))
+                    info = $"из хранилища: {mapping.StorageFieldId}";
                 else if (mapping.IsAggregate)
                     info = mapping.AggregateType == "OrganizationName" ? "название организации" : "автонумерация";
                 summary += $"   • {marker} → {info}\n";

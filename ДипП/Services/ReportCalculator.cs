@@ -7,10 +7,14 @@ namespace ДипП.Services
 {
     public class ReportCalculator
     {
-        private bool IsNumericColumn(string columnName, StorageConfig storageConfig)
+        private bool IsNumericColumn(string columnId, StorageConfig storageConfig)
         {
-            var field = storageConfig.Fields.FirstOrDefault(f => f.Key == columnName);
-            return field?.Type == "number";
+            if (int.TryParse(columnId, out int id))
+            {
+                var field = storageConfig.Fields.FirstOrDefault(f => f.Id == id);
+                return field?.Type == "number";
+            }
+            return false;
         }
 
         public decimal SumColumn(List<Dictionary<string, string>> rows, string columnName, StorageConfig storageConfig)
@@ -27,7 +31,7 @@ namespace ДипП.Services
             }
             return sum;
         }
-        /// Подсчет суммы по указанной колонке
+
         public decimal SumColumn(List<Dictionary<string, string>> rows, string columnName)
         {
             decimal sum = 0;
@@ -41,8 +45,6 @@ namespace ДипП.Services
             return sum;
         }
 
-
-        /// Подсчет суммы по нескольким колонкам
         public Dictionary<string, decimal> SumColumns(List<Dictionary<string, string>> rows, List<string> columnNames)
         {
             var result = new Dictionary<string, decimal>();
@@ -53,14 +55,12 @@ namespace ДипП.Services
             return result;
         }
 
-        /// Вычисление процента (part / total * 100)
         public decimal CalculatePercentage(decimal part, decimal total)
         {
             if (total == 0) return 0;
             return Math.Round(part / total * 100, 1);
         }
 
-        /// Подсчет среднего значения по колонке
         public decimal AverageColumn(List<Dictionary<string, string>> rows, string columnName)
         {
             decimal sum = SumColumn(rows, columnName);
@@ -68,8 +68,6 @@ namespace ДипП.Services
             return count == 0 ? 0 : Math.Round(sum / count, 1);
         }
 
-
-        /// Создание итоговой строки для таблицы
         public Dictionary<string, string> CreateTotalRow(List<Dictionary<string, string>> rows, List<string> columnsToSum)
         {
             var totalRow = new Dictionary<string, string>();
@@ -83,9 +81,10 @@ namespace ДипП.Services
             return totalRow;
         }
 
-
-        /// Группировка строк по полю с подсчетом сумм
-        public Dictionary<string, Dictionary<string, decimal>> GroupByWithSum( List<Dictionary<string, string>> rows,string groupByColumn, List<string> sumColumns)
+        public Dictionary<string, Dictionary<string, decimal>> GroupByWithSum(
+            List<Dictionary<string, string>> rows,
+            string groupByColumn,
+            List<string> sumColumns)
         {
             var result = new Dictionary<string, Dictionary<string, decimal>>();
 
@@ -116,9 +115,7 @@ namespace ДипП.Services
             return result;
         }
 
-
-        /// Получение статистики для отображения в Preview
-        public string GetStatisticsText(List<Dictionary<string, string>> rows, List<string> summaryColumns)
+        public string GetStatisticsText(List<Dictionary<string, string>> rows, List<string> summaryColumns, StorageConfig storageConfig)
         {
             if (rows.Count == 0) return "Нет данных для статистики";
 
@@ -133,26 +130,20 @@ namespace ДипП.Services
             {
                 decimal colSum = sums[col];
                 decimal percent = CalculatePercentage(colSum, total);
-                result.AppendLine($"{GetDisplayName(col)}: {colSum} ({percent}%)");
+                result.AppendLine($"{GetDisplayName(col, storageConfig)}: {colSum} ({percent}%)");
             }
 
             return result.ToString();
         }
 
-        /// Вспомогательный метод для отображения названий колонок
-        private string GetDisplayName(string columnName)
+        private string GetDisplayName(string columnId, StorageConfig storageConfig)
         {
-
-            switch (columnName)
+            if (int.TryParse(columnId, out int id))
             {
-                case "TotalParticipants": return "Всего участников";
-                case "Children0to14": return "Дети до 14";
-                case "Children14to35": return "Молодежь 14-35";
-                case "AdultsOver35": return "Взрослые";
-                case "Participants": return "Участники";
-                default: return columnName;
+                var field = storageConfig.Fields.FirstOrDefault(f => f.Id == id);
+                return field?.Display ?? columnId;
             }
-
+            return columnId;
         }
     }
 }

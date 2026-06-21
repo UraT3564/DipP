@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using ДипП.Services;
 
@@ -39,6 +40,7 @@ namespace ДипП
             int labelWidth = 140;
             int controlWidth = 230;
 
+            this.Icon = new Icon(System.IO.Path.Combine(Application.StartupPath,"Res\\icons8.ico"));
             Label lblOrganization = new Label
             {
                 Text = "Название организации:",

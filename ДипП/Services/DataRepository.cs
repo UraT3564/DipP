@@ -39,7 +39,8 @@ namespace ДипП
                 }
 
                 // Проверка целостности файла
-                if (!HashHelper.VerifyFileIntegrity(fullPath) && !_integrityWarningShown)
+                string hashPath = fullPath + ".hash";
+                if (File.Exists(hashPath) && !HashHelper.VerifyFileIntegrity(fullPath) && !_integrityWarningShown)
                 {
                     _integrityWarningShown = true;
                     var result = MessageBox.Show(

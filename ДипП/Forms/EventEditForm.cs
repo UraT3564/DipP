@@ -52,6 +52,7 @@ namespace ДипП
             int controlWidth = 270;
             int leftMargin = 15;
 
+            this.Icon = new Icon(System.IO.Path.Combine(Application.StartupPath, "Res\\icons8.ico"));
             // Поле даты (для _event.Date)
             Label lblDate = new Label
             {
@@ -78,7 +79,7 @@ namespace ДипП
             foreach (var fieldConfig in _storageConfig.Fields)
             {
                 string displayName = fieldConfig.Display;
-                string fieldKey = fieldConfig.Key;
+                int fieldId = fieldConfig.Id;  // было Key
 
                 Label lbl = new Label
                 {
@@ -95,7 +96,7 @@ namespace ДипП
                 {
                     DateTimePicker dtp = new DateTimePicker
                     {
-                        Name = fieldKey,
+                        Name = Convert.ToString(fieldId),  // было Key
                         Location = new Point(leftMargin + labelWidth + 5, y),
                         Size = new Size(controlWidth, 25),
                         Format = DateTimePickerFormat.Custom,
@@ -107,7 +108,7 @@ namespace ДипП
                 {
                     TextBox txt = new TextBox
                     {
-                        Name = fieldKey,
+                        Name = Convert.ToString(fieldId),  // было Key
                         Location = new Point(leftMargin + labelWidth + 5, y),
                         Size = new Size(controlWidth, 25)
                     };
@@ -117,7 +118,7 @@ namespace ДипП
                 {
                     TextBox txt = new TextBox
                     {
-                        Name = fieldKey,
+                        Name = Convert.ToString(fieldId),  // было Key
                         Location = new Point(leftMargin + labelWidth + 5, y),
                         Size = new Size(controlWidth, 25)
                     };
@@ -125,7 +126,7 @@ namespace ДипП
                 }
 
                 this.Controls.Add(inputControl);
-                _fieldControls[fieldKey] = inputControl;
+                _fieldControls[Convert.ToString(fieldId)] = inputControl;  // было Key
                 y += 35;
             }
 
@@ -164,47 +165,40 @@ namespace ДипП
             if (_fieldControls.ContainsKey("Date") && _fieldControls["Date"] is DateTimePicker dtpDate)
             {
                 if (_event.Fields.ContainsKey("EventDate") && DateTime.TryParse(_event.Fields["EventDate"]?.ToString(), out DateTime eventDate))
-                {
                     dtpDate.Value = eventDate;
-                }
                 else if (!string.IsNullOrEmpty(_event.Date) && DateTime.TryParse(_event.Date, out DateTime dateFromDate))
-                {
                     dtpDate.Value = dateFromDate;
-                }
             }
 
-            // Загружаем остальные динамические поля
+            // Загружаем остальные поля по Id
             foreach (var field in _fieldControls)
             {
-                if (field.Key == "Date") continue;
+                string fieldId = field.Key;  // теперь это Id, а не Key
+                if (fieldId == "Date") continue;
 
-                string fieldKey = field.Key;
-                if (field.Value is TextBox txtBox && _event.Fields.ContainsKey(fieldKey))
+                if (field.Value is TextBox txt && _event.Fields.ContainsKey(fieldId))
                 {
-                    txtBox.Text = _event.Fields[fieldKey]?.ToString() ?? "";
+                    txt.Text = _event.Fields[fieldId]?.ToString() ?? "";
                 }
-                else if (field.Value is ComboBox comboBox && _event.Fields.ContainsKey(fieldKey))
+                else if (field.Value is DateTimePicker dtp && _event.Fields.ContainsKey(fieldId))
                 {
-                    comboBox.SelectedItem = _event.Fields[fieldKey]?.ToString();
-                }
-                else if (field.Value is CheckBox checkBox && _event.Fields.ContainsKey(fieldKey))
-                {
-                    bool isChecked = _event.Fields[fieldKey]?.ToString() == "true" || _event.Fields[fieldKey]?.ToString() == "1";
-                    checkBox.Checked = isChecked;
-                }
-                else if (field.Value is DateTimePicker dtp && _event.Fields.ContainsKey(fieldKey))
-                {
-                    if (DateTime.TryParse(_event.Fields[fieldKey]?.ToString(), out DateTime parsedDate))
+                    if (DateTime.TryParse(_event.Fields[fieldId]?.ToString(), out DateTime parsedDate))
                         dtp.Value = parsedDate;
                 }
+                else if (field.Value is ComboBox combo && _event.Fields.ContainsKey(fieldId))
+                {
+                    combo.SelectedItem = _event.Fields[fieldId]?.ToString();
+                }
+                else if (field.Value is CheckBox chk && _event.Fields.ContainsKey(fieldId))
+                {
+                    chk.Checked = _event.Fields[fieldId]?.ToString() == "true";
+                }
             }
-
-            // Если есть обязательные поля, можно их подсветить или оставить как есть
         }
 
         private void BtnSave_Click(object sender, EventArgs e)
         {
-            // Получаем дату из DateTimePicker
+            // Получаем дату
             DateTime selectedDate = DateTime.Now;
             if (_fieldControls.ContainsKey("Date") && _fieldControls["Date"] is DateTimePicker dtpDate)
             {
@@ -217,14 +211,17 @@ namespace ДипП
             if (!_isEdit)
             {
                 string eventName = "";
-                if (_fieldControls.ContainsKey("EventName") && _fieldControls["EventName"] is TextBox txtName)
+                var nameField = _storageConfig.Fields.FirstOrDefault(f => f.Display == "Название мероприятия" || f.Required);
+                if (nameField != null && _fieldControls.ContainsKey(nameField.Id.ToString()) && _fieldControls[nameField.Id.ToString()] is TextBox txtName)
+                {
                     eventName = txtName.Text;
+                }
 
                 var existingEvents = _repository.GetByType(_storageConfig.Type);
                 var duplicate = existingEvents.FirstOrDefault(ev =>
                     ev.Date == selectedDate.ToString("yyyy-MM-dd") &&
-                    ev.Fields.ContainsKey("EventName") &&
-                    ev.Fields["EventName"]?.ToString() == eventName);
+                    ev.Fields.ContainsKey(nameField?.Id.ToString() ?? "") &&
+                    ev.Fields[nameField?.Id.ToString() ?? ""]?.ToString() == eventName);
 
                 if (duplicate != null)
                 {
@@ -237,9 +234,17 @@ namespace ДипП
             // Сохраняем остальные поля
             foreach (var field in _fieldControls)
             {
-                if (field.Key == "Date") continue;
+                string fieldKey = field.Key;
+                if (fieldKey == "Date") continue;
+
                 if (field.Value is TextBox txt)
-                    _event.Fields[field.Key] = txt.Text;
+                    _event.Fields[fieldKey] = txt.Text;
+                else if (field.Value is DateTimePicker dtp)
+                    _event.Fields[fieldKey] = dtp.Value.ToString("dd.MM.yyyy");
+                else if (field.Value is ComboBox combo)
+                    _event.Fields[fieldKey] = combo.SelectedItem?.ToString() ?? "";
+                else if (field.Value is CheckBox chk)
+                    _event.Fields[fieldKey] = chk.Checked ? "true" : "false";
             }
 
             this.DialogResult = DialogResult.OK;

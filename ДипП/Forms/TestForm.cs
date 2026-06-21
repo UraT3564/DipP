@@ -61,7 +61,10 @@ this.MaximizeBox = false;
             }
             else
             {
-                MessageBox.Show("Ошибка загрузки хранилища", "Error 1", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _currentStorageConfig = null;
+                MessageBox.Show("Хранилища данных не найдены.\n\n" +
+                    "Создайте новое хранилище через кнопку «Хранилища» на главной форме.",
+                    "Информация", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -74,6 +77,7 @@ this.MaximizeBox = false;
             int currentY = 10;
             int margin = 15;
 
+            this.Icon = new Icon(System.IO.Path.Combine(Application.StartupPath, "Res\\icons8.ico"));
             // ===== ЗАГОЛОВОК =====
             lblMonthInfo = new Label
             {
@@ -293,6 +297,14 @@ this.MaximizeBox = false;
         {
             try
             {
+                // Проверка на null
+                if (_currentStorageConfig == null)
+                {
+                    MessageBox.Show("Хранилище не загружено. Создайте хранилище через кнопку «Хранилища».",
+                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
                 var now = DateTime.Now;
                 var events = _dataRepository.GetByType(_currentStorageConfig.Type)
                     .Where(e =>
@@ -309,7 +321,7 @@ this.MaximizeBox = false;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка загрузки данных: {ex.Message}","Error 2");
+                MessageBox.Show($"Ошибка загрузки данных: {ex.Message}", "Error 2");
             }
         }
         // Обработчики событий (заглушки)
@@ -404,15 +416,15 @@ this.MaximizeBox = false;
                     return;
                 }
 
-                string fieldKey = firstRequiredField.Key;
-                string fieldValue = gridEvents.SelectedRows[0].Cells[fieldKey]?.Value?.ToString();
+                string fieldDisplay = firstRequiredField.Display;
+                string fieldValue = gridEvents.SelectedRows[0].Cells[fieldDisplay]?.Value?.ToString();
                 string eventDate = gridEvents.SelectedRows[0].Cells["Date"]?.Value?.ToString();
 
                 var events = _dataRepository.GetByType(_currentStorageConfig.Type);
                 var target = events.FirstOrDefault(ev =>
                     ev.Date == eventDate &&
-                    ev.Fields.ContainsKey(fieldKey) &&
-                    ev.Fields[fieldKey]?.ToString() == fieldValue);
+                    ev.Fields.ContainsKey(firstRequiredField.Id.ToString()) &&
+                    ev.Fields[firstRequiredField.Id.ToString()]?.ToString() == fieldValue);
 
                 eventId = target?.Id;
             }
@@ -535,28 +547,27 @@ this.MaximizeBox = false;
                         if (fieldMapping.AggregateType == "OrganizationName")
                         {
                             value = _organizationName;
-                            Console.WriteLine($"OrganizationName = {value}");
                         }
                         else if (fieldMapping.AggregateType == "AutoNumber")
                         {
                             continue;
                         }
                     }
-                    else if (!string.IsNullOrEmpty(fieldMapping.StorageField))
+                    else if (!string.IsNullOrEmpty(fieldMapping.StorageFieldId))  // ← было StorageField
                     {
-                        string storageField = fieldMapping.StorageField;
+                        string storageFieldId = fieldMapping.StorageFieldId;  // ← было StorageField
 
-                        if (storageField == "Month")
+                        if (storageFieldId == "Month")
                         {
                             value = date.ToString("MMMM");
                         }
-                        else if (storageField == "Year")
+                        else if (storageFieldId == "Year")
                         {
                             value = date.Year.ToString();
                         }
-                        else if (events.Count > 0 && events[0].Fields.ContainsKey(storageField))
+                        else if (events.Count > 0 && events[0].Fields.ContainsKey(storageFieldId))
                         {
-                            value = events[0].Fields[storageField]?.ToString() ?? "";
+                            value = events[0].Fields[storageFieldId]?.ToString() ?? "";
                             if (!string.IsNullOrEmpty(fieldMapping.DateFormat))
                             {
                                 value = DateHelper.FormatDateValue(value, fieldMapping.DateFormat);
@@ -583,12 +594,12 @@ this.MaximizeBox = false;
                         {
                             row[markerKey] = fieldMapping.StaticValue ?? "";
                         }
-                        else if (!string.IsNullOrEmpty(fieldMapping.StorageField))
+                        else if (!string.IsNullOrEmpty(fieldMapping.StorageFieldId))  // ← было StorageField
                         {
-                            string storageField = fieldMapping.StorageField;
-                            if (ev.Fields.ContainsKey(storageField))
+                            string storageFieldId = fieldMapping.StorageFieldId;  // ← было StorageField
+                            if (ev.Fields.ContainsKey(storageFieldId))
                             {
-                                string value = ev.Fields[storageField]?.ToString() ?? "";
+                                string value = ev.Fields[storageFieldId]?.ToString() ?? "";
                                 if (!string.IsNullOrEmpty(fieldMapping.DateFormat))
                                 {
                                     value = DateHelper.FormatDateValue(value, fieldMapping.DateFormat);
@@ -637,7 +648,7 @@ this.MaximizeBox = false;
                 Cursor = Cursors.Default;
             }
         }
-        
+
         private void DisplayEvents(List<DataEntity> events)
         {
             if (events == null || events.Count == 0)
@@ -652,10 +663,10 @@ this.MaximizeBox = false;
             // Колонка Date всегда первая
             dt.Columns.Add("Date", typeof(string));
 
-            // Добавляем колонки из конфига хранилища
+            // Добавляем колонки из конфига хранилища (используем Display)
             foreach (var field in _currentStorageConfig.Fields)
             {
-                dt.Columns.Add(field.Key, typeof(string));
+                dt.Columns.Add(field.Display, typeof(string));
             }
 
             // Заполняем строки
@@ -666,11 +677,11 @@ this.MaximizeBox = false;
                 // Дата
                 row["Date"] = ev.Date;
 
-                // Остальные поля по ключам из конфига
+                // Остальные поля по Id (из конфига хранилища)
                 foreach (var field in _currentStorageConfig.Fields)
                 {
-                    if (ev.Fields.ContainsKey(field.Key))
-                        row[field.Key] = ev.Fields[field.Key]?.ToString() ?? "";
+                    if (ev.Fields.ContainsKey(field.Id.ToString()))  // ← преобразуем в строку
+                    row[field.Display] = ev.Fields[field.Id.ToString()]?.ToString() ?? "";
                 }
 
                 dt.Rows.Add(row);
@@ -688,10 +699,9 @@ this.MaximizeBox = false;
                 }
                 else
                 {
-                    var field = _currentStorageConfig.Fields.FirstOrDefault(f => f.Key == col.Name);
-                    col.HeaderText = field?.Display ?? col.Name;
+                    // Заголовок уже из Display, ничего не меняем
+                    col.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
                 }
-                col.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             }
 
             // Обновляем заголовок
@@ -702,25 +712,19 @@ this.MaximizeBox = false;
         {
             if (gridEvents.SelectedRows.Count == 0) return null;
 
-            // Получаем Id из скрытой колонки (если добавили)
-            if (gridEvents.Columns.Contains("Id") && gridEvents.Columns["Id"].Visible == false)
-            {
-                return gridEvents.SelectedRows[0].Cells["Id"]?.Value?.ToString();
-            }
-
-            // Резервный вариант — ищем по первому обязательному полю из конфига
+            // Ищем по первому обязательному полю из конфига (используем Display для поиска)
             var firstRequiredField = _currentStorageConfig.Fields.FirstOrDefault(f => f.Required);
             if (firstRequiredField == null) return null;
 
-            string fieldKey = firstRequiredField.Key;
-            string fieldValue = gridEvents.SelectedRows[0].Cells[fieldKey]?.Value?.ToString();
+            string fieldDisplay = firstRequiredField.Display;
+            string fieldValue = gridEvents.SelectedRows[0].Cells[fieldDisplay]?.Value?.ToString();
             string eventDate = gridEvents.SelectedRows[0].Cells["Date"]?.Value?.ToString();
 
             var events = _dataRepository.GetByType(_currentStorageConfig.Type);
             var target = events.FirstOrDefault(ev =>
                 ev.Date == eventDate &&
-                ev.Fields.ContainsKey(fieldKey) &&
-                ev.Fields[fieldKey]?.ToString() == fieldValue);
+                ev.Fields.ContainsKey(firstRequiredField.Id.ToString()) &&
+                ev.Fields[firstRequiredField.Id.ToString()]?.ToString() == fieldValue);
 
             return target?.Id;
         }

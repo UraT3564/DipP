@@ -31,10 +31,10 @@ namespace ДипП
             _templates = templates;
             _repository = repository;
             _storageConfigService = new StorageConfigService();
-            SetupControls();
+            SetupForm();
         }
 
-        private void SetupControls()
+        private void SetupForm()
         {
             this.Text = "Настройки отчета";
             this.Size = new Size(850, 650); // шире для правой панели
@@ -45,6 +45,7 @@ namespace ДипП
             int currentY = 10;
             int leftMargin = 10;
             int rightPanelX = 730; // позиция для правой панели
+            this.Icon = new Icon(System.IO.Path.Combine(Application.StartupPath, "Res\\icons8.ico"));
 
             // ===== ВЕРХНЯЯ ПАНЕЛЬ =====
             Label lblTemplate = new Label
@@ -244,7 +245,7 @@ namespace ДипП
                     foreach (var mapping in _selectedTemplate.TableFieldMappings)
                     {
                         string markerName = mapping.Key;
-                        string storageField = mapping.Value.StorageField;
+                        string storageField = mapping.Value.StorageFieldId;
 
                         if (!string.IsNullOrEmpty(storageField) && ev.Fields.ContainsKey(storageField))
                         {
@@ -316,7 +317,7 @@ namespace ДипП
                 else
                 {
                     string dateInfo = string.IsNullOrEmpty(mapping.DateFormat) ? "" : $" [{mapping.DateFormat}]";
-                    lstProperties.Items.Add($"   • {marker} → {mapping.StorageField}{dateInfo}");
+                    lstProperties.Items.Add($"   • {marker} → {mapping.StorageFieldId}{dateInfo}");
                 }
             }
             lstProperties.Items.Add("──────────────");
@@ -337,7 +338,7 @@ namespace ДипП
                 else
                 {
                     string dateInfo = string.IsNullOrEmpty(mapping.DateFormat) ? "" : $" [{mapping.DateFormat}]";
-                    lstProperties.Items.Add($"   • {marker} → {mapping.StorageField}{dateInfo}");
+                    lstProperties.Items.Add($"   • {marker} → {mapping.StorageFieldId}{dateInfo}");
                 }
             }
         }

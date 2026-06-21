@@ -9,7 +9,7 @@ namespace ДипП.Models
 {
     public class StorageField
     {
-        public string Key { get; set; }
+        public int Id { get; set; }
         public string Display { get; set; }
         public string Type { get; set; }  // "string", "number", "date", "link"
         public bool Required { get; set; }

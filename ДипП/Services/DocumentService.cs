@@ -277,13 +277,13 @@ namespace ДипП.Services
                 var mapping = config.TextFieldMappings[cleanName];
                 if (mapping.IsStatic)
                     return mapping.StaticValue ?? "";
-                if (!string.IsNullOrEmpty(mapping.StorageField))
+                if (!string.IsNullOrEmpty(mapping.StorageFieldId))
                 {
-                    if (mapping.StorageField == "OrganizationName")
+                    if (mapping.StorageFieldId == "OrganizationName")
                         return "Алексеевский СДК";
-                    if (mapping.StorageField == "Month")
+                    if (mapping.StorageFieldId == "Month")
                         return DateTime.Now.ToString("MMMM");
-                    if (mapping.StorageField == "Year")
+                    if (mapping.StorageFieldId == "Year")
                         return DateTime.Now.Year.ToString();
                 }
             }

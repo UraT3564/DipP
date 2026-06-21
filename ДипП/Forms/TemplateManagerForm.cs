@@ -69,6 +69,7 @@ namespace ДипП
             int margin = 12;
             int currentY = 10;
 
+            this.Icon = new Icon(System.IO.Path.Combine(Application.StartupPath, "Res\\icons8.ico"));
             // Заголовок
             Label lblTitle = new Label
             {

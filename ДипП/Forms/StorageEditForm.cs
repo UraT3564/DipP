@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 using ДипП.Models;
 using ДипП.Services;
@@ -25,8 +24,9 @@ namespace ДипП
         private Button btnCancel;
 
         public StorageEditForm(StorageConfigService configService, StorageConfig existingStorage = null)
-        {this.FormBorderStyle = FormBorderStyle.FixedSingle;  // запрещает растягивание
-this.MaximizeBox = false;  
+        {
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;  // запрещает растягивание
+            this.MaximizeBox = false;
             _configService = configService;
             _storage = existingStorage ?? new StorageConfig
             {
@@ -56,6 +56,7 @@ this.MaximizeBox = false;
             int labelWidth = 150;
             int controlWidth = 480;
 
+            this.Icon = new Icon(System.IO.Path.Combine(Application.StartupPath, "Res\\icons8.ico"));
             // ===== Основные параметры =====
             GroupBox grpMain = new GroupBox
             {
@@ -161,7 +162,7 @@ this.MaximizeBox = false;
             };
 
             // Колонки
-            dgvFields.Columns.Add("Key", "Ключ (идентификатор)");
+            dgvFields.Columns.Add("Id", "ID");
             dgvFields.Columns.Add("Display", "Отображаемое имя");
             dgvFields.Columns.Add("Type", "Тип данных");
             dgvFields.Columns.Add("Required", "Обязательное");
@@ -257,13 +258,14 @@ this.MaximizeBox = false;
             dgvFields.Rows.Clear();
             foreach (var field in _fields)
             {
-                dgvFields.Rows.Add(field.Key, field.Display, field.Type, field.Required);
+                dgvFields.Rows.Add(field.Id, field.Display, field.Type, field.Required);
             }
         }
 
         private void BtnAddField_Click(object sender, EventArgs e)
         {
-            dgvFields.Rows.Add("new_field", "Новое поле", "string", false);
+            int newId = GenerateFieldId();
+            dgvFields.Rows.Add(newId, "Новое поле", "string", false);
         }
 
         private void BtnRemoveField_Click(object sender, EventArgs e)
@@ -314,23 +316,30 @@ this.MaximizeBox = false;
             {
                 if (row.IsNewRow) continue;
 
-                string key = row.Cells["Key"]?.Value?.ToString();
-                string display = row.Cells["Display"]?.Value?.ToString();
-                string type = row.Cells["Type"]?.Value?.ToString();
-                bool required = row.Cells["Required"]?.Value is true;
-
-                if (string.IsNullOrEmpty(key))
+                if (row.Cells["Id"].Value == null)
                 {
-                    MessageBox.Show("Ключ поля не может быть пустым", "Ошибка",
+                    MessageBox.Show("ID поля не может быть пустым", "Ошибка",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                int id = (int)row.Cells["Id"].Value;
+                string display = row.Cells["Display"].Value?.ToString() ?? "";
+                string type = row.Cells["Type"].Value?.ToString() ?? "string";
+                bool required = row.Cells["Required"].Value is true;
+
+                if (string.IsNullOrEmpty(display))
+                {
+                    MessageBox.Show("Отображаемое имя поля не может быть пустым", "Ошибка",
                         MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
                 fields.Add(new StorageField
                 {
-                    Key = key,
-                    Display = display ?? key,
-                    Type = type ?? "string",
+                    Id = id,
+                    Display = display,
+                    Type = type,
                     Required = required
                 });
             }
@@ -346,11 +355,26 @@ this.MaximizeBox = false;
             else
                 _configService.AddStorage(_storage);
 
-            // Создаём папку и файл данных
             _configService.CreateDataFileIfNotExists(autoPath);
 
             this.DialogResult = DialogResult.OK;
             this.Close();
+        }
+        private int GenerateFieldId()
+        {
+            var existingIds = new HashSet<int>();
+            foreach (DataGridViewRow row in dgvFields.Rows)
+            {
+                if (row.IsNewRow) continue;
+                if (row.Cells["Id"].Value is int id)
+                    existingIds.Add(id);
+            }
+
+            int newId = 1;
+            while (existingIds.Contains(newId))
+                newId++;
+
+            return newId;
         }
     }
 }

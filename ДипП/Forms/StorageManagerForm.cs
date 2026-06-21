@@ -44,6 +44,7 @@ namespace ДипП
             int margin = 15;
             int currentY = 15;
 
+            this.Icon = new Icon(System.IO.Path.Combine(Application.StartupPath, "Res\\icons8.ico"));
             // Заголовок
             Label lblTitle = new Label
             {
@@ -103,7 +104,7 @@ namespace ДипП
                 BackgroundColor = Color.White,
                 BorderStyle = BorderStyle.Fixed3D
             };
-            dgvFields.Columns.Add("Key", "Ключ");
+            dgvFields.Columns.Add("Id", "ID");
             dgvFields.Columns.Add("Display", "Отображаемое имя");
             dgvFields.Columns.Add("Type", "Тип");
             dgvFields.Columns.Add("Required", "Обязательное");
@@ -206,7 +207,7 @@ namespace ДипП
                 {
                     foreach (var field in _selectedStorage.Fields)
                     {
-                        dgvFields.Rows.Add(field.Key, field.Display, field.Type, field.Required ? "Да" : "Нет");
+                        dgvFields.Rows.Add(field.Id, field.Display, field.Type, field.Required ? "Да" : "Нет");
                     }
                 }
             }

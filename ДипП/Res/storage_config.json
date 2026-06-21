@@ -7,55 +7,55 @@
       "type": "event",
       "fields": [
         {
-          "key": "EventName",
+          "id": 1,
           "display": "Название мероприятия",
           "type": "string",
           "required": true
         },
         {
-          "key": "EventDate",
+          "id": 2,
           "display": "Дата",
           "type": "date",
           "required": true
         },
         {
-          "key": "EventLink",
+          "id": 3,
           "display": "Ссылка",
           "type": "link",
           "required": false
         },
         {
-          "key": "TotalParticipants",
+          "id": 4,
           "display": "Участники (всего)",
           "type": "number",
           "required": false
         },
         {
-          "key": "Location",
+          "id": 5,
           "display": "Место",
           "type": "string",
           "required": false
         },
         {
-          "key": "Responsible",
+          "id": 6,
           "display": "Ответственный",
           "type": "string",
           "required": false
         },
         {
-          "key": "Children0to14",
+          "id": 7,
           "display": "Дети 0-14 лет",
           "type": "number",
           "required": false
         },
         {
-          "key": "Children14to35",
+          "id": 8,
           "display": "Дети 14-35 лет",
           "type": "number",
           "required": false
         },
         {
-          "key": "AdultsOver35",
+          "id": 9,
           "display": "Взрослые (35+)",
           "type": "number",
           "required": false
@@ -69,13 +69,13 @@
       "type": "event",
       "fields": [
         {
-          "key": "Name",
+          "id": 1,
           "display": "Название",
           "type": "string",
           "required": true
         },
         {
-          "key": "Count",
+          "id": 2,
           "display": "Количество",
           "type": "number",
           "required": false

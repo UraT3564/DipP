@@ -32,7 +32,7 @@ namespace ДипП.Models
 
     public class FieldMapping
     {
-        public string StorageField { get; set; }
+        public string StorageFieldId { get; set; }
         public string DateFormat { get; set; }
         public bool IsStatic { get; set; }
         public string StaticValue { get; set; }

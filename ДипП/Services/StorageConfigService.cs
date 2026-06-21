@@ -18,54 +18,69 @@ namespace ДипП.Services
             {
                 string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _configPath);
 
-                if (!File.Exists(fullPath))
+                // 1. Пробуем загрузить основной файл
+                if (File.Exists(fullPath))
+                {
+                    string json = File.ReadAllText(fullPath, Encoding.UTF8);
+                    var root = JsonConvert.DeserializeObject<StorageConfigRoot>(json);
+
+                    if (root?.Storages != null && root.Storages.Count > 0)
+                    {
+                        return root.Storages;
+                    }
+                    Console.WriteLine("[StorageConfigService] Конфиг пуст");
+                }
+                else
                 {
                     Console.WriteLine($"[StorageConfigService] Файл не найден: {fullPath}");
-                    return CreateDefaultStorage();
                 }
 
-                string json = File.ReadAllText(fullPath, Encoding.UTF8);
-                var root = JsonConvert.DeserializeObject<StorageConfigRoot>(json);
-
-                if (root?.Storages == null || root.Storages.Count == 0)
+                // 2. Пробуем восстановить из бекапа
+                string backupPath = fullPath + ".backup";
+                if (File.Exists(backupPath))
                 {
-                    Console.WriteLine("[StorageConfigService] Конфиг пуст, создаю хранилище по умолчанию");
-                    return CreateDefaultStorage();
+                    Console.WriteLine($"[StorageConfigService] Восстанавливаем из бекапа: {backupPath}");
+
+                    string json = File.ReadAllText(backupPath, Encoding.UTF8);
+                    var root = JsonConvert.DeserializeObject<StorageConfigRoot>(json);
+
+                    if (root?.Storages != null && root.Storages.Count > 0)
+                    {
+                        // Восстанавливаем основной файл из бекапа
+                        File.Copy(backupPath, fullPath, true);
+                        Console.WriteLine("[StorageConfigService] Конфиг восстановлен из бекапа");
+                        return root.Storages;
+                    }
                 }
 
-                return root.Storages;
+                // 3. Бекапа нет — возвращаем пустой список
+                Console.WriteLine("[StorageConfigService] Бекап не найден, возвращаем пустой список");
+                return new List<StorageConfig>();
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[StorageConfigService] Ошибка загрузки: {ex.Message}");
-                return CreateDefaultStorage();
-            }
-        }
 
-        private List<StorageConfig> CreateDefaultStorage()
-        {
-            var defaultStorage = new StorageConfig
-            {
-                Id = "main_events",
-                DisplayName = "Основное хранилище (мероприятия)",
-                FilePath = "Res/Data/storage.json",
-                Type = "event",
-                Fields = new List<StorageField>
+                // При ошибке тоже пробуем бекап
+                string fullPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _configPath);
+                string backupPath = fullPath + ".backup";
+                if (File.Exists(backupPath))
                 {
-                    new StorageField { Key = "EventName", Display = "Название мероприятия", Type = "string", Required = true },
-                    new StorageField { Key = "EventDate", Display = "Дата", Type = "date", Required = true },
-                    new StorageField { Key = "EventLink", Display = "Ссылка", Type = "link", Required = false },
-                    new StorageField { Key = "Participants", Display = "Участники (всего)", Type = "number", Required = false },
-                    new StorageField { Key = "TotalParticipants", Display = "Участники (всего)", Type = "number", Required = false },
-                    new StorageField { Key = "Location", Display = "Место", Type = "string", Required = false },
-                    new StorageField { Key = "Responsible", Display = "Ответственный", Type = "string", Required = false },
-                    new StorageField { Key = "Children0to14", Display = "Дети 0-14 лет", Type = "number", Required = false },
-                    new StorageField { Key = "Children14to35", Display = "Дети 14-35 лет", Type = "number", Required = false },
-                    new StorageField { Key = "AdultsOver35", Display = "Взрослые (35+)", Type = "number", Required = false }
+                    try
+                    {
+                        string json = File.ReadAllText(backupPath, Encoding.UTF8);
+                        var root = JsonConvert.DeserializeObject<StorageConfigRoot>(json);
+                        if (root?.Storages != null && root.Storages.Count > 0)
+                        {
+                            File.Copy(backupPath, fullPath, true);
+                            return root.Storages;
+                        }
+                    }
+                    catch { }
                 }
-            };
 
-            return new List<StorageConfig> { defaultStorage };
+                return new List<StorageConfig>();
+            }
         }
 
         public void SaveAll(List<StorageConfig> storages)
