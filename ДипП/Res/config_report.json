@@ -1,11 +1,11 @@
 [
   {
     "id": "1740012345",
-    "displayName": "Отчет о работе СДК за месяц",
+    "displayName": "Отчет о работе КДЦ за месяц",
     "templateFile": "Отчет_месячный.docx",
     "fields": [ "OrganizationName", "Month", "Year" ],
     "tableColumns": [ "Number", "EventName", "EventDate", "EventLink", "Participants", "Location", "Responsible" ],
-    "summaryColumns":[]
+    "summaryColumns": []
   },
   {
     "id": "1740012346",

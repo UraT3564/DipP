@@ -611,8 +611,14 @@ namespace ДипП
             };
             if (_selectedStorage != null)
             {
-                cmbStorageField.Items.AddRange(_selectedStorage.Fields.Select(f => f.Id.ToString()).ToArray());
-                cmbStorageField.Items.Insert(0, "(не выбрано)");
+                // Создаем список с "не выбрано" в начале
+                var fieldList = new List<StorageField>();
+                fieldList.Add(new StorageField { Id = 0, Display = "(не выбрано)" });
+                fieldList.AddRange(_selectedStorage.Fields);
+
+                cmbStorageField.DataSource = fieldList;
+                cmbStorageField.DisplayMember = "Display";
+                cmbStorageField.ValueMember = "Id";
             }
             valuePanel.Controls.Add(cmbStorageField);
 
@@ -665,7 +671,32 @@ namespace ДипП
                 if (selectedType == "📁 Данные из хранилища")
                 {
                     cmbStorageField.Visible = true;
-                    cmbStorageField.SelectedItem = !string.IsNullOrEmpty(mapping.StorageFieldId) ? mapping.StorageFieldId : "(не выбрано)";
+                    if (!string.IsNullOrEmpty(mapping.StorageFieldId) && int.TryParse(mapping.StorageFieldId, out int id))
+                    {
+                        // Ищем поле с таким Id в DataSource
+                        foreach (var item in cmbStorageField.Items)
+                        {
+                            var field = item as StorageField;
+                            if (field != null && field.Id == id)
+                            {
+                                cmbStorageField.SelectedItem = item;
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Если не найдено — выбираем "(не выбрано)"
+                        foreach (var item in cmbStorageField.Items)
+                        {
+                            var field = item as StorageField;
+                            if (field != null && field.Id == 0)
+                            {
+                                cmbStorageField.SelectedItem = item;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
             else
@@ -732,7 +763,8 @@ namespace ДипП
             {
                 if (selectedType == "📁 Данные из хранилища")
                 {
-                    mapping.StorageFieldId = cmbStorageField.SelectedItem?.ToString();
+                    var selectedField = cmbStorageField.SelectedItem as StorageField;
+                    mapping.StorageFieldId = selectedField?.Id.ToString() ?? "";
                 }
                 else if (selectedType == "🔢 Автонумерация")
                 {

@@ -70,7 +70,7 @@ this.MaximizeBox = false;
 
         private void SetupForm()
         {
-            this.Text = "Управление данными СДК";
+            this.Text = "Управление данными КДЦ";
             this.StartPosition = FormStartPosition.CenterScreen;
             this.Font = new Font("Segoe UI", 10);
 

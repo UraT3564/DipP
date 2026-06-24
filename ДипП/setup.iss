@@ -1,10 +1,10 @@
 [Setup]
-AppName=Управление отчетностью СДК
+AppName=Управление отчетностью КДЦ
 AppVersion=1.0
-DefaultDirName={pf}\Управление отчетностью СДК
-DefaultGroupName=Управление отчетностью СДК
+DefaultDirName={pf}\Управление отчетностью КДЦ
+DefaultGroupName=Управление отчетностью КДЦ
 OutputDir=Deploy
-OutputBaseFilename=Управление_отчетностью_СДК_Setup
+OutputBaseFilename=Управление_отчетностью_КДЦ_Setup
 Compression=lzma
 SolidCompression=yes
 
@@ -18,7 +18,7 @@ Source: "bin\Release\Newtonsoft.Json.dll"; DestDir: "{app}"
 Source: "bin\Release\Res\*"; DestDir: "{app}\Res"; Flags: recursesubdirs
 
 [Icons]
-Name: "{group}\Управление отчетностью СДК"; Filename: "{app}\ДипП.exe"
+Name: "{group}\Управление отчетностью КДЦ"; Filename: "{app}\ДипП.exe"
 Name: "{group}\Удалить"; Filename: "{uninstallexe}"
 Name: "{commondesktop}\Управление отчетностью СДК"; Filename: "{app}\ДипП.exe"
 

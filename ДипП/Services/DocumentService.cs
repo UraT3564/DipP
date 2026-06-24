@@ -280,7 +280,7 @@ namespace ДипП.Services
                 if (!string.IsNullOrEmpty(mapping.StorageFieldId))
                 {
                     if (mapping.StorageFieldId == "OrganizationName")
-                        return "Алексеевский СДК";
+                        return "Алексеевский КДЦ";
                     if (mapping.StorageFieldId == "Month")
                         return DateTime.Now.ToString("MMMM");
                     if (mapping.StorageFieldId == "Year")

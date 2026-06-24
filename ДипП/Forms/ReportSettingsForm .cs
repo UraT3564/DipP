@@ -25,7 +25,7 @@ namespace ДипП
 
         public ReportSettingsForm(List<TemplateConfig> templates, DataRepository repository)
         {
-            this.FormBorderStyle = FormBorderStyle.FixedSingle;  // запрещает растягивание
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;  
             this.MaximizeBox = false;
             InitializeComponent();
             _templates = templates;
@@ -216,7 +216,6 @@ namespace ДипП
 
             try
             {
-                // Получаем тип хранилища из шаблона
                 string storageType = _selectedStorage?.Type ?? "event";
 
                 var allEvents = _repository.GetByType(storageType);
@@ -232,7 +231,6 @@ namespace ДипП
 
                 var dt = new DataTable();
 
-                // Добавляем колонки из маппинга таблицы (используем ключи маппинга)
                 var displayColumns = _selectedTemplate.TableFieldMappings.Keys.ToList();
                 foreach (var col in displayColumns)
                 {
@@ -245,19 +243,37 @@ namespace ДипП
                     foreach (var mapping in _selectedTemplate.TableFieldMappings)
                     {
                         string markerName = mapping.Key;
-                        string storageField = mapping.Value.StorageFieldId;
+                        string storageFieldId = mapping.Value.StorageFieldId;
 
-                        if (!string.IsNullOrEmpty(storageField) && ev.Fields.ContainsKey(storageField))
+                        if (!string.IsNullOrEmpty(storageFieldId))
                         {
-                            string value = ev.Fields[storageField]?.ToString() ?? "";
-
-                            // Применяем формат даты если нужно
-                            if (mapping.Value.DateFormat != null && !string.IsNullOrEmpty(value))
+                            // Пытаемся найти поле в хранилище по ID
+                            StorageField field = null;
+                            if (_selectedStorage != null)
                             {
-                                value = DateHelper.FormatDateValue(value, mapping.Value.DateFormat);
+                                // Если ID число — парсим
+                                if (int.TryParse(storageFieldId, out int id))
+                                {
+                                    field = _selectedStorage.Fields.FirstOrDefault(f => f.Id == id);
+                                }
                             }
 
-                            row[markerName] = value;
+                            // Если поле найдено — используем его ID как ключ
+                            string key = field != null ? field.Id.ToString() : storageFieldId;
+
+                            if (ev.Fields.ContainsKey(key))
+                            {
+                                string value = ev.Fields[key]?.ToString() ?? "";
+                                if (mapping.Value.DateFormat != null && !string.IsNullOrEmpty(value))
+                                {
+                                    value = DateHelper.FormatDateValue(value, mapping.Value.DateFormat);
+                                }
+                                row[markerName] = value;
+                            }
+                            else
+                            {
+                                row[markerName] = "";
+                            }
                         }
                         else
                         {
